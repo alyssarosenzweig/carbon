@@ -12,8 +12,21 @@ number -> [0-9] {% id %}
           | number [0-9] {% function(d) { return "" + d[0] + d[1] } %}
 word -> [A-Za-z] {% id %}
         | word [A-Za-z0-9] {% function(d) { return "" + d[0] + d[1] } %}
-value -> number {% only %}
-        | word {% only %}
+
+# order of operations
+
+# multiplication + division (TODO)
+MD -> N {% id %}
+
+# addition + subtraction
+AS -> AS _ "+" _ MD {% function(d) { return ["+", d[0], d[4]]} %}
+      | MD {% id %}
+
+# number
+N -> number {% id %}
+    | word {% id %}
+
+value -> AS {% id %}
 
 declUndef -> type " " word {% function(d) { return ["decl", d[0], d[2], null] } %}
 declInit -> declUndef _ "=" _ value {% function(d) { return [d[0][0], d[0][1], d[0][2], d[4]] } %}
