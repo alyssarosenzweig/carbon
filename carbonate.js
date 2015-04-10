@@ -8,11 +8,15 @@ fs.readFile(process.argv[2], function(err, content) {
 
   var output = [
     "function Soda(stdlib, foreign, buffer) {",
-      '"use asm;"'
+      '"use asm";'
   ];
+
+  var functionList = [];
 
   tokens.map(function(globalStatement) {
     if(globalStatement[0] == "func") {
+      functionList.push(globalStatement[2]);
+
       var flatParams = [];
 
       globalStatement[3].map(function(p) {
@@ -37,9 +41,17 @@ fs.readFile(process.argv[2], function(err, content) {
     console.log(globalStatement);
   });
 
+  // return function list
+
+  output.push("return {");
+  functionList.map(function(f) {
+    output.push(f+": "+f+",");
+  })
   output.push("}");
 
-  console.log(output.join("\n"));
+  output.push("}");
+
+  fs.writeFile("testsoda.js", output.join("\n"));
 })
 
 function parameterCoercion(type, name) {
@@ -53,6 +65,4 @@ function parameterCoercion(type, name) {
   console.log(name);
 
   process.exit(0);
-
-  return "";
 }
