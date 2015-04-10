@@ -1,8 +1,9 @@
 @{% function only(d) { return d[0] } %}
 @{% function doubleonly(d) { return d[0][0] } %}
+@{% function flat(d) { return [d[0]].concat(d[1]) } %}
 
 # main
-main -> _ block _ {% function(d) { return d } %}
+main -> _ function _ {% function(d) { return d } %}
 
 baretype -> "int" | "float"
 type -> baretype {% doubleonly %}
@@ -20,9 +21,9 @@ declaration -> declInit | declUndef
 function -> type " " word _ "(" _ params _ ")" _ "{" _ block _  "}"
             {% function(d) { return ["func", d[0], d[2], d[6], d[12]] }%}
 param -> type " " word {% function(d) { return [d[0], d[2]] } %}
-params -> null | param | param _ "," _ params {% function(d) { return [d[0]].concat(d[4]) }%}
+params -> null | param | param _ "," _ params {% flat %}
 
-block -> statement | statement block
+block -> statement | statement block {% flat %}
 statement -> _ declaration ";" {% function(d){return d[1]} %}
 
 # whitespace
