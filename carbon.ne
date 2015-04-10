@@ -10,13 +10,16 @@ type -> baretype {% doubleonly %}
 
 number -> [0-9] {% id %}
           | number [0-9] {% function(d) { return "" + d[0] + d[1] } %}
-word -> [A-Za-z0-9] {% id %}
+word -> [A-Za-z] {% id %}
         | word [A-Za-z0-9] {% function(d) { return "" + d[0] + d[1] } %}
 value -> number {% only %}
+        | word {% only %}
 
 declUndef -> type " " word {% function(d) { return ["decl", d[0], d[2], null] } %}
 declInit -> declUndef _ "=" _ value {% function(d) { return [d[0][0], d[0][1], d[0][2], d[4]] } %}
-declaration -> declInit | declUndef
+declaration -> _ declInit | _ declUndef
+
+return -> _ "return " value {% function(d) { return ["return", d[2]] } %}
 
 function -> type " " word _ "(" _ params _ ")" _ "{" block _ "}"
             {% function(d) { return ["func", d[0], d[2], d[6], d[11]] }%}
@@ -24,7 +27,8 @@ param -> type " " word {% function(d) { return [d[0], d[2]] } %}
 params -> null | param | params _ "," _ param {% function(d){ return d[0].concat([d[4]])} %}
 
 block -> statement | block statement {% function(d) { return d[0].concat([d[1]])} %}
-statement -> _ declaration ";" {% function(d){return d[1][0]} %}
+statement -> declaration ";" {% function(d){return d[0][1]} %}
+            | return ";"  {% id %}
 
 # whitespace
 _ -> null {% function(d) { return null } %}
