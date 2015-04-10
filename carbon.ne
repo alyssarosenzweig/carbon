@@ -15,12 +15,19 @@ word -> [A-Za-z] {% id %}
 
 # order of operations
 
-# multiplication + division (TODO)
-MD -> N {% id %}
+# parans
+P -> "(" _ AS _ ")" {% function(d) { return d[2] } %}
+    | N {% id %}
+
+# multiplication + division
+MD -> MD _ "*" _ P {% function(d) { return ["*", d[0], d[4]] } %}
+    | MD _ "/" _ P {% function(d) { return ["/", d[0], d[4]] } %}
+    | P {% id %}
 
 # addition + subtraction
 AS -> AS _ "+" _ MD {% function(d) { return ["+", d[0], d[4]]} %}
-      | MD {% id %}
+    | AS _ "-" _ MD {% function(d) { return ["-", d[0], d[4]]} %}
+    | MD {% id %}
 
 # number
 N -> number {% id %}
