@@ -28,5 +28,11 @@ var carbon = function(ctx) {
 
     // save context
     ctx.gl = gl;
+    ctx.gl.clearColor(1.0, 1.0, 0.0, 1.0);
+    ctx.gl.enable(gl.DEPTH_TEST);
+    ctx.gl.depthFunc(gl.LEQUAL);
+    ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
   }
+
+  return ctx;
 };
