@@ -141,33 +141,48 @@ function compileExpression(exp, localContext, globalContext, rtype) {
     var leftOp = compileExpression(exp[1], localContext, globalContext, rtype),
         rightOp = compileExpression(exp[2], localContext, globalContext, rtype);
 
-    var o = "("+leftOp+"/"+rightOp+")";
-
     if(rtype) {
+      var o = "("+leftOp[0]+"/"+rightOp[0]+")";
+
       var type1 = leftOp[1], type2 = rightOp[2];
       if(type1 == type2) {
         return [o, type1];
       } else {
         console.error("Unable to establish shared type: ");
         console.error(type1+" and "+type2);
+        console.log(exp);
         process.exit(0);
       }
     }
 
-    return o;
+    return "("+leftOp+"/"+rightOp+")";;
   } else if(exp[0] == "*") {
     var leftOp = compileExpression(exp[1], localContext, globalContext),
         rightOp = compileExpression(exp[2], localContext, globalContext);
 
     return "(MathImul("+leftOp+","+rightOp+")|0)";
   } else if(exp[0] == "-") {
-    var leftOp = compileExpression(exp[1], localContext, globalContext),
-        rightOp = compileExpression(exp[2], localContext, globalContext);
+    var leftOp = compileExpression(exp[1], localContext, globalContext, rtype),
+        rightOp = compileExpression(exp[2], localContext, globalContext, rtype);
+
+    if(rtype) {
+      var cross = crossFixnum(leftOp, rightOp);
+      var o = "("+cross[0]+"-"+cross[1]+")";
+
+      return [o, cross[2]];
+    }
 
     return "("+leftOp+"-"+rightOp+")";
   } else if(exp[0] == "+") {
-    var leftOp = compileExpression(exp[1], localContext, globalContext),
-        rightOp = compileExpression(exp[2], localContext, globalContext);
+    var leftOp = compileExpression(exp[1], localContext, globalContext, rtype),
+        rightOp = compileExpression(exp[2], localContext, globalContext, rtype);
+
+    if(rtype) {
+      var cross = crossFixnum(leftOp, rightOp);
+      var o = "("+cross[0]+"+"+cross[1]+")";
+
+      return [o, cross[2]];
+    }
 
     return "("+leftOp+"+"+rightOp+")";
   } else if( (exp * 1) == exp) {
@@ -190,14 +205,30 @@ function compileCondition(condition, localContext, globalContext) {
   var left = compileExpression(condition[0], localContext, globalContext, true),
      right = compileExpression(condition[2], localContext, globalContext, true);
 
-  console.log(left[1]+" vs "+right[1]);
+  var cross = crossFixnum(left, right);
+
+  return "(("+cross[0]+")"+condition[1]+"("+cross[1]+"))";
+}
+
+function crossFixnum(left, right) {
+  console.log(left+" cross "+right);
+
   if(left[1] == "fixnum" && ["double", "int"].indexOf(right[1]) > -1) {
-    left[0] = fixnum(left[0], right[1]);
+    return [fixnum(left[0], right[1]), right[0], right[1]];
   } else if(right[1] == "fixnum" && ["double", "int"].indexOf(left[1]) > -1) {
-    right[0] = fixnum(right[0], left[1]);
+    return [left[0], fixnum(right[0], left[1]), right[1]];
+  } else if(right[1] == left[1] && right[1] == "fixnum") {
+    if( ((right[0]|0) != right[0]) || ((left[0]|0) != left[0]) ) {
+      return ["+"+left[0], "+"+right[0], "double"];
+    } else if( (right[0]|0 == right[0]) && (left[0]|0 == right[0]|0) ) {
+      return [left[0]+"|0", right[0]+"|0", "int"];
+    } else {
+      console.error("Not sure how to fix num .-.");
+      process.exit(0);
+    }
   }
 
-  return "(("+left[0]+")"+condition[1]+"("+right[0]+"))";
+  return [left[0], right[0]];
 }
 
 function fixnum(num, type) {
@@ -228,11 +259,11 @@ function contextType(n) {
 function compileBlock(block) {
   block.forEach(function(statement) {
     if(statement[0] == "return") {
-      var c = compileExpression(statement[1], localContext, globalContext);
-      output.push(returnCoercion(c, globalStatement[1]));
+      var c = compileExpression(statement[1], localContext, globalContext, true);
+      output.push(returnCoercion(c[0], globalStatement[1]));
     } else if(statement[0] == "assignment") {
-      var c = compileExpression(statement[3], localContext, globalContext);
-      output.push(statement[1]+statement[2]+fixnum(c, contextType(statement[1])));
+      var c = compileExpression(statement[3], localContext, globalContext, true);
+      output.push(statement[1]+statement[2]+fixnum(c[0], contextType(statement[1])));
     } else if(Array.isArray(statement[0])) {
       var stmt = statement[0];
 
