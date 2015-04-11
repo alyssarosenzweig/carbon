@@ -3,12 +3,13 @@
 @{% function flat(d) { return d[1].concat(d[0]) } %}
 
 # main
-main -> _ program _ {% function(d) { return d[1] } %}
+main -> _ program {% function(d) { return d[1] } %}
 
-globalLine -> function | declaration
-program -> globalLine _ {% id %} | program globalLine {% function(d) { return d[0].concat(d[1]) }%}
+globalLine -> function {% id %} | declaration ";" {% id %}
+ln -> globalLine _ {% id %}
+program -> ln {% id %} | program ln {% function(d) { return d[0].concat(d[1]) }%}
 
-baretype -> "int" | "double"
+baretype -> "int" | "double" | "void"
 type -> baretype {% doubleonly %}
 
 integer -> [0-9] {% id %}
@@ -43,7 +44,7 @@ value -> AS {% id %}
 
 declUndef -> type " " word {% function(d) { return ["decl", d[0], d[2], null] } %}
 declInit -> declUndef _ "=" _ value {% function(d) { return [d[0][0], d[0][1], d[0][2], d[4]] } %}
-declaration -> _ declInit | _ declUndef
+declaration -> declInit | _ declUndef
 
 return -> _ "return " value {% function(d) { return ["return", d[2]] } %}
 
