@@ -136,65 +136,32 @@ function returnCoercion(value, type) {
   process.exit(0);
 }
 
-function compileExpression(exp, localContext, globalContext, rtype) {
+function compileArithm(exp, localContext, globalContext, op) {
+  var leftOp = compileExpression(exp[1], localContext, globalContext),
+      rightOp = compileExpression(exp[2], localContext, globalContext);
+
+  var cross = crossFixnum(leftOp, rightOp);
+  var o = "("+cross[0]+op+cross[1]+")";
+
+  return [o, cross[2]];
+}
+
+function compileExpression(exp, localContext, globalContext) {
   if(exp[0] == "/") {
-    var leftOp = compileExpression(exp[1], localContext, globalContext, rtype),
-        rightOp = compileExpression(exp[2], localContext, globalContext, rtype);
-
-    if(rtype) {
-      var o = "("+leftOp[0]+"/"+rightOp[0]+")";
-
-      var type1 = leftOp[1], type2 = rightOp[2];
-      if(type1 == type2) {
-        return [o, type1];
-      } else {
-        console.error("Unable to establish shared type: ");
-        console.error(type1+" and "+type2);
-        console.log(exp);
-        process.exit(0);
-      }
-    }
-
-    return "("+leftOp+"/"+rightOp+")";;
+    return compileArithm(exp, localContext, globalContext, "/");
   } else if(exp[0] == "*") {
     var leftOp = compileExpression(exp[1], localContext, globalContext),
         rightOp = compileExpression(exp[2], localContext, globalContext);
 
     return "(MathImul("+leftOp+","+rightOp+")|0)";
   } else if(exp[0] == "-") {
-    var leftOp = compileExpression(exp[1], localContext, globalContext, rtype),
-        rightOp = compileExpression(exp[2], localContext, globalContext, rtype);
-
-    if(rtype) {
-      var cross = crossFixnum(leftOp, rightOp);
-      var o = "("+cross[0]+"-"+cross[1]+")";
-
-      return [o, cross[2]];
-    }
-
-    return "("+leftOp+"-"+rightOp+")";
+    return compileArithm(exp, localContext, globalContext, "-");
   } else if(exp[0] == "+") {
-    var leftOp = compileExpression(exp[1], localContext, globalContext, rtype),
-        rightOp = compileExpression(exp[2], localContext, globalContext, rtype);
-
-    if(rtype) {
-      var cross = crossFixnum(leftOp, rightOp);
-      var o = "("+cross[0]+"+"+cross[1]+")";
-
-      return [o, cross[2]];
-    }
-
-    return "("+leftOp+"+"+rightOp+")";
+    return compileArithm(exp, localContext, globalContext, "+");
   } else if( (exp * 1) == exp) {
-    if(rtype)
-      return [exp, "fixnum"];
-
-    return exp;
+    return [exp, "fixnum"];
   } else if( localContext[exp] || globalContext[exp]) {
-    if(rtype)
-      return [exp, (localContext[exp] && localContext.type) || globalContext[exp].type];
-
-    return exp;
+    return [exp, (localContext[exp] && localContext.type) || globalContext[exp].type];
   }
 
   console.log(exp);
@@ -202,8 +169,8 @@ function compileExpression(exp, localContext, globalContext, rtype) {
 }
 
 function compileCondition(condition, localContext, globalContext) {
-  var left = compileExpression(condition[0], localContext, globalContext, true),
-     right = compileExpression(condition[2], localContext, globalContext, true);
+  var left = compileExpression(condition[0], localContext, globalContext),
+     right = compileExpression(condition[2], localContext, globalContext);
 
   var cross = crossFixnum(left, right);
 
@@ -259,10 +226,10 @@ function contextType(n) {
 function compileBlock(block) {
   block.forEach(function(statement) {
     if(statement[0] == "return") {
-      var c = compileExpression(statement[1], localContext, globalContext, true);
+      var c = compileExpression(statement[1], localContext, globalContext);
       output.push(returnCoercion(c[0], globalStatement[1]));
     } else if(statement[0] == "assignment") {
-      var c = compileExpression(statement[3], localContext, globalContext, true);
+      var c = compileExpression(statement[3], localContext, globalContext);
       output.push(statement[1]+statement[2]+fixnum(c[0], contextType(statement[1])));
     } else if(Array.isArray(statement[0])) {
       var stmt = statement[0];
