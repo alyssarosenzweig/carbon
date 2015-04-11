@@ -13,6 +13,8 @@ var globalContext = {};
 var initCode = [];
 var localContext = {};
 
+var initExists = false, loopExists = false;
+
 var globalStatement;
 
 fs.readFile(process.argv[2], function(err, content) {
@@ -55,6 +57,10 @@ fs.readFile(process.argv[2], function(err, content) {
       // carbonation can inject code if necessary
       if(globalStatement[2] == "init") {
         globalStatement[4] = initCode.concat(globalStatement[4]);
+        initExists = true;
+      } else if(globalStatement[2] == "loop") {
+        // prevents weird ReferenceError's at runtime
+        loopExists = true;
       }
 
       // function body compilation
@@ -90,6 +96,11 @@ fs.readFile(process.argv[2], function(err, content) {
   output.push("}");
 
   output.push("}");
+
+  if(!(initExists && loopExists)) {
+    die("init and/or loop don't exist",
+        "Please define these functions to produce working Soda");
+  }
 
   fs.writeFile("testsoda.js", output.join("\n"));
 })
