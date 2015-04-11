@@ -49,6 +49,10 @@ declaration -> declInit {% id %}
 
 assignment -> word _ assignmentOperator _ value {% function(d) { return ["assignment", d[0], d[2], d[4]] } %}
 assignmentOperator -> "=" {% id %}
+                    | "+=" {% id %}
+                    | "-=" {% id %}
+                    | "*=" {% id %}
+                    | "/=" {% id %}
 
 IfStatement -> bareifStatement | elseIfStatement
 ElseBlock -> IfStatement {% id %}
