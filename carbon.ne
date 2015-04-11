@@ -11,8 +11,11 @@ program -> globalLine _ {% id %} | program globalLine {% function(d) { return d[
 baretype -> "int" | "double"
 type -> baretype {% doubleonly %}
 
-number -> [0-9] {% id %}
-          | number [0-9] {% function(d) { return "" + d[0] + d[1] } %}
+integer -> [0-9] {% id %}
+          | integer [0-9] {% function(d) { return "" + d[0] + d[1] } %}
+floating -> integer "." integer {% function(d) { return +(d[0]+d[1]+d[2]) } %}
+number -> floating {% id %} | integer {% id %}
+
 word -> [A-Za-z] {% id %}
         | word [A-Za-z0-9] {% function(d) { return "" + d[0] + d[1] } %}
 

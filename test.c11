@@ -3,5 +3,5 @@ int sumi(int a, int b) {
 }
 
 double sumf(double a, double b) {
-  return a + b;
+  return ((a + b) * (a + b));
 }
