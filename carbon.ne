@@ -3,7 +3,7 @@
 @{% function flat(d) { return d[1].concat(d[0]) } %}
 
 # main
-main -> _ IfStatement _ {% function(d) { return d[1] } %}
+main -> _ program {% function(d) { return d[1] } %}
 
 globalLine -> function {% id %} | declaration ";" {% id %}
 program -> globalLine _ {% function(d) { return [d[0]] } %}
@@ -70,9 +70,10 @@ param -> type " " word {% function(d) { return [d[0], d[2]] } %}
 params -> null | param | params _ "," _ param {% function(d){ return d[0].concat([d[4]])} %}
 
 block -> statement | block statement {% function(d) { return d[0].concat([d[1]])} %}
-statement -> declaration ";" {% function(d){return d[0]} %}
+statement -> declaration ";" {% id %}
             | return ";"  {% id %}
             | assignment ";" {% id %}
+            | _ IfStatement {% function(d) { return d[1] } %}
 
 # whitespace
 _ -> null {% function(d) { return null } %}
