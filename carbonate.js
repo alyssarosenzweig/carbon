@@ -4,7 +4,7 @@ var grammar = require("./carbon.nec.js");
 var parser = new nearley.Parser(grammar.ParserRules, grammar.ParserStart);
 
 fs.readFile(process.argv[2], function(err, content) {
-  var tokens = parser.feed(content.toString()).results;
+  var tokens = parser.feed(content.toString()).results[0];
 
   var output = [
     "function Soda(stdlib, foreign, buffer) {",

@@ -3,7 +3,10 @@
 @{% function flat(d) { return d[1].concat(d[0]) } %}
 
 # main
-main -> _ function _ {% function(d) { return d[1] } %}
+main -> _ program _ {% function(d) { return d[1] } %}
+
+globalLine -> function | declaration
+program -> globalLine _ {% id %} | program globalLine {% function(d) { return d[0].concat(d[1]) }%}
 
 baretype -> "int" | "float"
 type -> baretype {% doubleonly %}
