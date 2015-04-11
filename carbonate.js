@@ -53,6 +53,9 @@ fs.readFile(process.argv[2], function(err, content) {
         if(statement[0] == "return") {
           var c = compileExpression(statement[1], localContext, globalContext);
           output.push(returnCoercion(c, globalStatement[1]));
+        } else if(statement[0] == "assignment") {
+          var c = compileExpression(statement[3], localContext, globalContext);
+          output.push(statement[1]+statement[2]+c);
         } else {
           console.log("Unknown statement in function body");
           console.log(statement);
@@ -64,6 +67,12 @@ fs.readFile(process.argv[2], function(err, content) {
       output.push("}");
     } else if(globalStatement[0] == "decl") {
       output.push(declarationCoercion(globalStatement[1], globalStatement[2]));
+
+      globalContext[globalStatement[2]] = {
+        type: globalStatement[1],
+        name: globalStatement[2],
+        source: "decl"
+      }
 
       if(globalStatement[3] != 0) {
         console.error("Carbonation cannot initialize variable yet.");
