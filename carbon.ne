@@ -3,7 +3,7 @@
 @{% function flat(d) { return d[1].concat(d[0]) } %}
 
 # main
-main -> _ program {% function(d) { return d[1] } %}
+main -> _ IfStatement _ {% function(d) { return d[1] } %}
 
 globalLine -> function {% id %} | declaration ";" {% id %}
 program -> globalLine _ {% function(d) { return [d[0]] } %}
@@ -49,6 +49,18 @@ declaration -> declInit {% id %}
 
 assignment -> word _ assignmentOperator _ value {% function(d) { return ["assignment", d[0], d[2], d[4]] } %}
 assignmentOperator -> "=" {% id %}
+
+IfStatement -> bareifStatement | elseIfStatement
+ElseBlock -> IfStatement {% id %}
+          | "{" _ block _ "}" {% function(d) { return d[2] } %}
+bareifStatement -> "if" _ "(" _ condition _ ")" _ "{" _ block _ "}"
+                {% function(d) { return ["if", d[4], d[10]] } %}
+elseIfStatement -> bareifStatement _ "else" _ ElseBlock
+                  {% function(d) { return ["ifElse", d[0], d[4]] } %}
+
+condition -> value _ conditional _ value {% function(d) { return [d[0], d[2], d[4]]} %}
+conditionals -> "==" | ">=" | "<=" | "!=" | ">" | "<"
+conditional -> conditionals {% function(d) { return d[0][0] } %}
 
 return -> _ "return " value {% function(d) { return ["return", d[2]] } %}
 
