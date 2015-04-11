@@ -69,15 +69,10 @@ fs.readFile(process.argv[2], function(err, content) {
       }
 
       if(globalStatement[3] != 0) {
-        console.error("Carbonation cannot initialize variable yet.");
-        console.error("Problematic variable:");
-        console.error(globalStatement);
-        process.exit(0);
+        die("Carbonation cannot initialize variable yet:", globalStatement);
       }
     } else {
-      console.log("Unknown global statement");
-      console.log(globalStatement);
-      process.exit(0);
+      die("Unknown global statement: "+globalStatement);
     }
   });
 
@@ -101,9 +96,7 @@ function declarationCoercion(type, name) {
     return "var "+name+" = 0.0;";
   }
 
-  console.error("Unknown declaration type:");
-  console.error(type+" "+name);
-  process.exit(0);
+  die("Unknown declaraion type: ", type, name);
 }
 
 function parameterCoercion(type, name) {
@@ -114,11 +107,7 @@ function parameterCoercion(type, name) {
     return name+" = +"+name+";";
   }
 
-  console.error("Unknown parameter type:");
-  console.log(type);
-  console.log(name);
-
-  process.exit(0);
+  die("Unknown parameter type: ", type, name);
 }
 
 function returnCoercion(value, type) {
@@ -129,11 +118,7 @@ function returnCoercion(value, type) {
     return "return +("+value+")";
   }
 
-  console.error("Unknown return type:");
-  console.log(type);
-  console.log(name);
-
-  process.exit(0);
+  die("Unknown return type: ", type, name);
 }
 
 function compileArithm(exp, localContext, globalContext, op) {
@@ -162,10 +147,9 @@ function compileExpression(exp, localContext, globalContext) {
     return [exp, "fixnum"];
   } else if( localContext[exp] || globalContext[exp]) {
     return [exp, (localContext[exp] && localContext.type) || globalContext[exp].type];
+  } else {
+    die("Unknown expression: ", exp);
   }
-
-  console.log(exp);
-  return "";
 }
 
 function compileCondition(condition, localContext, globalContext) {
@@ -178,8 +162,6 @@ function compileCondition(condition, localContext, globalContext) {
 }
 
 function crossFixnum(left, right) {
-  console.log(left+" cross "+right);
-
   if(left[1] == "fixnum" && ["double", "int"].indexOf(right[1]) > -1) {
     return [fixnum(left[0], right[1]), right[0], right[1]];
   } else if(right[1] == "fixnum" && ["double", "int"].indexOf(left[1]) > -1) {
@@ -190,8 +172,7 @@ function crossFixnum(left, right) {
     } else if( (right[0]|0 == right[0]) && (left[0]|0 == right[0]|0) ) {
       return [left[0]+"|0", right[0]+"|0", "int"];
     } else {
-      console.error("Not sure how to fix num .-.");
-      process.exit(0);
+      die("Not sure how to fix num .-.", left, right);
     }
   }
 
@@ -205,7 +186,7 @@ function fixnum(num, type) {
     } else if(type == "int") {
       return "("+num+"|0)";
     } else {
-      console.error("Cannot fix "+num+" to "+type);
+      console.warn("Cannot fix "+num+" to "+type);
       return num;
     }
   }
@@ -219,8 +200,7 @@ function contextType(n) {
   if(localContext[n])
     return localContext[n].type;
 
-  console.error("Cannot find type of "+n+" in any context");
-  process.exit(0);
+  die("Cannot find type of "+n+" in any context");
 }
 
 function compileBlock(block) {
@@ -253,19 +233,20 @@ function compileBlock(block) {
         output.push("if"+condition+"{")
         compileBlock(stmt[2][0][2]);
         output.push("} ");
-
-
-        console.log(stmt);
-
       } else {
-        console.log("Unknown double nested statement in function body");
-        console.log(statement);
-        process.exit(0);
+        die("Unknown double nested statement in function body", statement);
       }
     } else {
-      console.log("Unknown statement in function body");
-      console.log(statement);
-      //process.exit(0);
+      die("Unknown statement in function body", statement);
     }
   })
+}
+
+// reports an error message and dies
+function die() {
+  for(var i = 0; i < arguments.length; ++i) {
+    console.error(arguments[i]);
+  }
+
+  process.exit(0);
 }
