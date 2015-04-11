@@ -10,7 +10,7 @@ var output = [
 ];
 
 var globalContext = {};
-
+var initCode = [];
 var localContext = {};
 
 var globalStatement;
@@ -52,6 +52,11 @@ fs.readFile(process.argv[2], function(err, content) {
         }
       })
 
+      // carbonation can inject code if necessary
+      if(globalStatement[2] == "init") {
+        globalStatement[4] = initCode.concat(globalStatement[4]);
+      }
+
       // function body compilation
       compileBlock(globalStatement[4]);
 
@@ -69,7 +74,7 @@ fs.readFile(process.argv[2], function(err, content) {
       }
 
       if(globalStatement[3] != 0) {
-        die("Carbonation cannot initialize variable yet:", globalStatement);
+        initCode.push(["assignment", globalStatement[2], "=", globalStatement[3]]);
       }
     } else {
       die("Unknown global statement: "+globalStatement);
