@@ -16,8 +16,16 @@
     ctx.initWebGL(1024, 768);
 
     drink = Soda(window, null, null);
-    console.log(drink.sumi(10, 20));
-    console.log(drink.sumf(2.2, 3.7));
+    requestAnimationFrame(loop);
+  }
+
+  function loop() {
+    var value = drink.loop();
+
+    ctx.gl.clearColor(value, value, value, 1.0);
+    ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
+
+    requestAnimationFrame(loop);
   }
 
   </script>
