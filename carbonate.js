@@ -8,7 +8,8 @@ fs.readFile(process.argv[2], function(err, content) {
 
   var output = [
     "function Soda(stdlib, foreign, buffer) {",
-      '"use asm";'
+      '"use asm";',
+      "var MathImul = stdlib.Math.imul;",
   ];
 
   var functionList = [];
@@ -111,7 +112,7 @@ function compileExpression(exp, localContext, globalContext) {
     var leftOp = compileExpression(exp[1], localContext, globalContext),
         rightOp = compileExpression(exp[2], localContext, globalContext);
 
-    return "("+leftOp+"*"+rightOp+")";
+    return "(MathImul("+leftOp+","+rightOp+")|0)";
   } else if(exp[0] == "-") {
     var leftOp = compileExpression(exp[1], localContext, globalContext),
         rightOp = compileExpression(exp[2], localContext, globalContext);
