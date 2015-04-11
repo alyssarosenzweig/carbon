@@ -244,6 +244,21 @@ function compileBlock(block) {
         compileBlock(stmt[2]);
 
         output.push("}");
+      } else if(stmt[0] == "ifElse") {
+        var condition = compileCondition(stmt[1][1], localContext, globalContext);
+
+        output.push("if"+condition+"{")
+        compileBlock(stmt[1][2]);
+        output.push("} else ");
+
+        condition = compileCondition(stmt[2][0][1], localContext, globalContext);
+        output.push("if"+condition+"{")
+        compileBlock(stmt[2][0][2]);
+        output.push("} ");
+
+
+        console.log(stmt);
+
       } else {
         console.log("Unknown double nested statement in function body");
         console.log(statement);
