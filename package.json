@@ -1,0 +1,31 @@
+{
+  "name": "carbon",
+  "version": "0.0.0",
+  "description": "Toolkit for writing fast games for the web",
+  "main": "carbonate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bobbybee/carbon.git"
+  },
+  "dependencies": {
+    "nearley": "latest"
+  },
+  "keywords": [
+    "web",
+    "game",
+    "asm.js",
+    "toolkit",
+    "webgl",
+    "compiler",
+    "c",
+    "fast"
+  ],
+  "author": "Alyssa Rosenzweig",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bobbybee/carbon/issues"
+  }
+}
