@@ -6,8 +6,7 @@
 main -> _ program {% function(d) { return d[1] } %}
 
 globalLine -> function {% id %} | declaration ";" {% id %}
-ln -> globalLine _ {% id %}
-program -> ln {% id %} | program ln {% function(d) { return d[0].concat(d[1]) }%}
+program -> globalLine _ {% id %} | program globalLine _ {% function(d) { return d[0].concat(d[1]) }%}
 
 baretype -> "int" | "double" | "void"
 type -> baretype {% doubleonly %}
