@@ -12,7 +12,7 @@ program -> globalLine _ {% function(d) { return [d[0]] } %}
 baretype -> "int" | "double" | "void"
 type -> baretype {% doubleonly %}
 
-integer -> [0-9] {% id %}
+integer -> [0-9\-] {% id %}
           | integer [0-9] {% function(d) { return "" + d[0] + d[1] } %}
 floating -> integer "." integer {% function(d) { return +(d[0]+d[1]+d[2]) } %}
 number -> floating {% id %} | integer {% id %}
