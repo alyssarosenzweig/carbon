@@ -73,7 +73,7 @@ block -> statement | block statement {% function(d) { return d[0].concat([d[1]])
 statement -> declaration ";" {% id %}
             | return ";"  {% id %}
             | assignment ";" {% id %}
-            | _ IfStatement _ {% function(d) { return d[1] } %}
+            | _ IfStatement {% function(d) { return d[1] } %}
 
 # whitespace
 _ -> null {% function(d) { return null } %}
