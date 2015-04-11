@@ -53,14 +53,20 @@ fs.readFile(process.argv[2], function(err, content) {
         if(statement[0] == "return") {
           var c = compileExpression(statement[1], localContext, globalContext);
           output.push(returnCoercion(c, globalStatement[1]));
+        } else {
+          console.log("Unknown statement in function body");
+          console.log(statement);
+          process.exit(0);
         }
-        console.log(statement);
       })
 
       // end function
       output.push("}");
+    } else {
+      console.log("Unknown global statement");
+      console.log(globalStatement);
+      process.exit(0);
     }
-    console.log(globalStatement);
   });
 
   // return function list
