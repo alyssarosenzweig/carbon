@@ -215,6 +215,16 @@ function fixnum(num, type) {
   return num;
 }
 
+function contextType(n) {
+  if(globalContext[n])
+    return globalContext[n].type;
+  if(localContext[n])
+    return localContext[n].type;
+
+  console.error("Cannot find type of "+n+" in any context");
+  process.exit(0);
+}
+
 function compileBlock(block) {
   block.forEach(function(statement) {
     if(statement[0] == "return") {
@@ -222,7 +232,7 @@ function compileBlock(block) {
       output.push(returnCoercion(c, globalStatement[1]));
     } else if(statement[0] == "assignment") {
       var c = compileExpression(statement[3], localContext, globalContext);
-      output.push(statement[1]+statement[2]+c);
+      output.push(statement[1]+statement[2]+fixnum(c, contextType(statement[1])));
     } else if(Array.isArray(statement[0])) {
       var stmt = statement[0];
 
