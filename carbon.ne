@@ -45,6 +45,9 @@ declUndef -> type " " word {% function(d) { return ["decl", d[0], d[2], null] } 
 declInit -> declUndef _ "=" _ value {% function(d) { return [d[0][0], d[0][1], d[0][2], d[4]] } %}
 declaration -> declInit | _ declUndef
 
+assignment -> word _ assignmentOperator _ value {% function(d) { return ["assignment", d[0], d[2], d[4]] } %}
+assignmentOperator -> "=" {% id %}
+
 return -> _ "return " value {% function(d) { return ["return", d[2]] } %}
 
 function -> type " " word _ "(" _ params _ ")" _ "{" block _ "}"
@@ -55,6 +58,7 @@ params -> null | param | params _ "," _ param {% function(d){ return d[0].concat
 block -> statement | block statement {% function(d) { return d[0].concat([d[1]])} %}
 statement -> declaration ";" {% function(d){return d[0][1]} %}
             | return ";"  {% id %}
+            | assignment ";" {% id %}
 
 # whitespace
 _ -> null {% function(d) { return null } %}
