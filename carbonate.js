@@ -56,12 +56,21 @@ fs.readFile(process.argv[2], function(err, content) {
         } else {
           console.log("Unknown statement in function body");
           console.log(statement);
-          process.exit(0);
+          //process.exit(0);
         }
       })
 
       // end function
       output.push("}");
+    } else if(globalStatement[0] == "decl") {
+      output.push(declarationCoercion(globalStatement[1], globalStatement[2]));
+
+      if(globalStatement[3] != 0) {
+        console.error("Carbonation cannot initialize variable yet.");
+        console.error("Problematic variable:");
+        console.error(globalStatement);
+        process.exit(0);
+      }
     } else {
       console.log("Unknown global statement");
       console.log(globalStatement);
@@ -81,6 +90,18 @@ fs.readFile(process.argv[2], function(err, content) {
 
   fs.writeFile("testsoda.js", output.join("\n"));
 })
+
+function declarationCoercion(type, name) {
+  if(type == "int") {
+    return "var "+name+" = 0;";
+  } else if(type == "double") {
+    return "var "+name+" = 0.0;";
+  }
+
+  console.error("Unknown declaration type:");
+  console.error(type+" "+name);
+  process.exit(0);
+}
 
 function parameterCoercion(type, name) {
   // TODO: more types
