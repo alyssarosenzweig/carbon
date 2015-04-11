@@ -66,6 +66,9 @@ return -> _ "return " value {% function(d) { return ["return", d[2]] } %}
 
 function -> type " " word _ "(" _ params _ ")" _ "{" _ block _ "}"
             {% function(d) { return ["func", d[0], d[2], d[6], d[12]] }%}
+          | type " " word _ "(" _ params _ ")" _ "{" _ "}"
+            {% function(d) { return ["func", d[0], d[2], d[6], []] } %}
+
 param -> type " " word {% function(d) { return [d[0], d[2]] } %}
 params -> null | param | params _ "," _ param {% function(d){ return d[0].concat([d[4]])} %}
 

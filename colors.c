@@ -2,7 +2,7 @@ double greyColor = 0.0;
 double direction = 0.01;
 
 void init() {
-  a = 2;
+
 }
 
 double loop() {
