@@ -3,20 +3,26 @@ var nearley = require("nearley");
 var grammar = require("./carbon.nec.js");
 var parser = new nearley.Parser(grammar.ParserRules, grammar.ParserStart);
 
+var output = [
+  "function Soda(stdlib, foreign, buffer) {",
+    '"use asm";',
+    "var MathImul = stdlib.Math.imul;",
+];
+
+var globalContext = {};
+
+var localContext = {};
+
+var globalStatement;
+
 fs.readFile(process.argv[2], function(err, content) {
   var tokens = parser.feed(content.toString()).results[0];
 
-  var output = [
-    "function Soda(stdlib, foreign, buffer) {",
-      '"use asm";',
-      "var MathImul = stdlib.Math.imul;",
-  ];
-
   var functionList = [];
 
-  var globalContext = {};
+  tokens.map(function(gs) {
+    globalStatement = gs;
 
-  tokens.map(function(globalStatement) {
     if(globalStatement[0] == "func") {
       functionList.push(globalStatement[2]);
 
@@ -30,8 +36,6 @@ fs.readFile(process.argv[2], function(err, content) {
 
       // function declaration
       output.push("function "+globalStatement[2]+"("+flatParams.join(",")+")"+"{");
-
-      localContext = {};
 
       // parameter coercion
       globalStatement[3].map(function(p) {
@@ -49,19 +53,9 @@ fs.readFile(process.argv[2], function(err, content) {
       })
 
       // function body compilation
-      globalStatement[4].map(function(statement) {
-        if(statement[0] == "return") {
-          var c = compileExpression(statement[1], localContext, globalContext);
-          output.push(returnCoercion(c, globalStatement[1]));
-        } else if(statement[0] == "assignment") {
-          var c = compileExpression(statement[3], localContext, globalContext);
-          output.push(statement[1]+statement[2]+c);
-        } else {
-          console.log("Unknown statement in function body");
-          console.log(statement);
-          //process.exit(0);
-        }
-      })
+      compileBlock(globalStatement[4]);
+
+      localContext = {};
 
       // end function
       output.push("}");
@@ -142,12 +136,25 @@ function returnCoercion(value, type) {
   process.exit(0);
 }
 
-function compileExpression(exp, localContext, globalContext) {
+function compileExpression(exp, localContext, globalContext, rtype) {
   if(exp[0] == "/") {
-    var leftOp = compileExpression(exp[1], localContext, globalContext),
-        rightOp = compileExpression(exp[2], localContext, globalContext);
+    var leftOp = compileExpression(exp[1], localContext, globalContext, rtype),
+        rightOp = compileExpression(exp[2], localContext, globalContext, rtype);
 
-    return "("+leftOp+"/"+rightOp+")";
+    var o = "("+leftOp+"/"+rightOp+")";
+
+    if(rtype) {
+      var type1 = leftOp[1], type2 = rightOp[2];
+      if(type1 == type2) {
+        return [o, type1];
+      } else {
+        console.error("Unable to establish shared type: ");
+        console.error(type1+" and "+type2);
+        process.exit(0);
+      }
+    }
+
+    return o;
   } else if(exp[0] == "*") {
     var leftOp = compileExpression(exp[1], localContext, globalContext),
         rightOp = compileExpression(exp[2], localContext, globalContext);
@@ -164,11 +171,78 @@ function compileExpression(exp, localContext, globalContext) {
 
     return "("+leftOp+"+"+rightOp+")";
   } else if( (exp * 1) == exp) {
+    if(rtype)
+      return [exp, "fixnum"];
+
     return exp;
   } else if( localContext[exp] || globalContext[exp]) {
+    if(rtype)
+      return [exp, (localContext[exp] && localContext.type) || globalContext[exp].type];
+
     return exp;
   }
 
   console.log(exp);
   return "";
+}
+
+function compileCondition(condition, localContext, globalContext) {
+  var left = compileExpression(condition[0], localContext, globalContext, true),
+     right = compileExpression(condition[2], localContext, globalContext, true);
+
+  console.log(left[1]+" vs "+right[1]);
+  if(left[1] == "fixnum" && ["double", "int"].indexOf(right[1]) > -1) {
+    left[0] = fixnum(left[0], right[1]);
+  } else if(right[1] == "fixnum" && ["double", "int"].indexOf(left[1]) > -1) {
+    right[0] = fixnum(right[0], left[1]);
+  }
+
+  return "(("+left[0]+")"+condition[1]+"("+right[0]+"))";
+}
+
+function fixnum(num, type) {
+  if( (num * 1) == num) {
+    if(type == "double") {
+      return "+"+num;
+    } else if(type == "int") {
+      return "("+num+"|0)";
+    } else {
+      console.error("Cannot fix "+num+" to "+type);
+      return num;
+    }
+  }
+
+  return num;
+}
+
+function compileBlock(block) {
+  block.forEach(function(statement) {
+    if(statement[0] == "return") {
+      var c = compileExpression(statement[1], localContext, globalContext);
+      output.push(returnCoercion(c, globalStatement[1]));
+    } else if(statement[0] == "assignment") {
+      var c = compileExpression(statement[3], localContext, globalContext);
+      output.push(statement[1]+statement[2]+c);
+    } else if(Array.isArray(statement[0])) {
+      var stmt = statement[0];
+
+      if(stmt[0] == "if") {
+        var condition = compileCondition(stmt[1], localContext, globalContext);
+
+        output.push("if"+condition+"{")
+
+        compileBlock(stmt[2]);
+
+        output.push("}");
+      } else {
+        console.log("Unknown double nested statement in function body");
+        console.log(statement);
+        process.exit(0);
+      }
+    } else {
+      console.log("Unknown statement in function body");
+      console.log(statement);
+      //process.exit(0);
+    }
+  })
 }
