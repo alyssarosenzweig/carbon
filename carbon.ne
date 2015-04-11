@@ -8,7 +8,7 @@ main -> _ program _ {% function(d) { return d[1] } %}
 globalLine -> function | declaration
 program -> globalLine _ {% id %} | program globalLine {% function(d) { return d[0].concat(d[1]) }%}
 
-baretype -> "int" | "float"
+baretype -> "int" | "double"
 type -> baretype {% doubleonly %}
 
 number -> [0-9] {% id %}

@@ -80,6 +80,8 @@ function parameterCoercion(type, name) {
   // TODO: more types
   if(type == "int") {
     return name+" = "+name+"|0;";
+  } else if(type == "double") {
+    return name+" = +"+name+";";
   }
 
   console.error("Unknown parameter type:");
@@ -93,6 +95,8 @@ function returnCoercion(value, type) {
   // TODO: more types
   if(type == "int") {
     return "return ("+value+")|0;";
+  } else if(type == "double") {
+    return "return +("+value+")";
   }
 
   console.error("Unknown return type:");
