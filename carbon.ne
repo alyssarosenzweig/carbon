@@ -6,7 +6,8 @@
 main -> _ program {% function(d) { return d[1] } %}
 
 globalLine -> function {% id %} | declaration ";" {% id %}
-program -> globalLine _ {% id %} | program globalLine _ {% function(d) { return d[0].concat(d[1]) }%}
+program -> globalLine _ {% function(d) { return [d[0]] } %}
+        | program globalLine _ {% function(d) { return d[0].concat([d[1]]) }%}
 
 baretype -> "int" | "double" | "void"
 type -> baretype {% doubleonly %}
@@ -43,7 +44,8 @@ value -> AS {% id %}
 
 declUndef -> type " " word {% function(d) { return ["decl", d[0], d[2], null] } %}
 declInit -> declUndef _ "=" _ value {% function(d) { return [d[0][0], d[0][1], d[0][2], d[4]] } %}
-declaration -> declInit | _ declUndef
+declaration -> declInit {% id %}
+              | declUndef {% id %}
 
 assignment -> word _ assignmentOperator _ value {% function(d) { return ["assignment", d[0], d[2], d[4]] } %}
 assignmentOperator -> "=" {% id %}
@@ -56,7 +58,7 @@ param -> type " " word {% function(d) { return [d[0], d[2]] } %}
 params -> null | param | params _ "," _ param {% function(d){ return d[0].concat([d[4]])} %}
 
 block -> statement | block statement {% function(d) { return d[0].concat([d[1]])} %}
-statement -> declaration ";" {% function(d){return d[0][1]} %}
+statement -> declaration ";" {% function(d){return d[0]} %}
             | return ";"  {% id %}
             | assignment ";" {% id %}
 
