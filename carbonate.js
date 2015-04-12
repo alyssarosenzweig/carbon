@@ -400,8 +400,18 @@ function dereference(exp) {
   var depth = exp.split("*").length - 1;
   var bare = exp.slice(depth);
 
-  // TODO: dereferencing logic
-  return bare;
+  var type = contextType(exp);
+  var bareType = type.slice(0, -depth);
+
+  var index = bare;
+
+  while(--depth) {
+      index = heapForType("void*") + "[("+index+")"+addressHeap("void*")+"]";
+  }
+
+  var d = heapForType(bareType) + "[("+index+")"+addressHeap(bareType)+"]";
+
+  return d;
 }
 
 // reports an error message and dies
