@@ -26,12 +26,23 @@ fs.readFile(process.argv[2], function(err, content) {
 
   var functionList = [];
 
-  // iterate to find functions AOT
+  // iterate to find metadata AOT
   tokens.map(function(gs) {
     if(gs[0] == "func") {
-      console.log(gs);
       functionLookup[gs[2]] = {
         return: gs[1]
+      }
+    } else if(gs[0] == "decl") {
+      output.push(declarationCoercion(gs[1], gs[2]));
+
+      globalContext[gs[2]] = {
+        type: gs[1],
+        name: gs[2],
+        source: "decl"
+      }
+
+      if(!!gs[3] && gs[3] != 0) {
+        initCode.push(["assignment", gs[2], "=", gs[3]]);
       }
     }
   })
@@ -85,17 +96,7 @@ fs.readFile(process.argv[2], function(err, content) {
       // end function
       output.push("}");
     } else if(globalStatement[0] == "decl") {
-      output.push(declarationCoercion(globalStatement[1], globalStatement[2]));
-
-      globalContext[globalStatement[2]] = {
-        type: globalStatement[1],
-        name: globalStatement[2],
-        source: "decl"
-      }
-
-      if(!!globalStatement[3] && globalStatement[3] != 0) {
-        initCode.push(["assignment", globalStatement[2], "=", globalStatement[3]]);
-      }
+      /* handled ahead-of-time to resolve asm.js compilation errors */
     } else if(globalStatement[0] == "comment") {
       /* no comment */
     } else {
