@@ -26,7 +26,9 @@ function id(x) {return x[0]; }
         return d.join('');
     }},
     {"name": "baretype", "symbols": [" string$3"]},
-    {"name": "type", "symbols": ["baretype"], "postprocess":  doubleonly },
+    {"name": "pointer", "symbols": [], "postprocess":  function() { return "" } },
+    {"name": "pointer", "symbols": [{"literal":"*"}, "pointer"], "postprocess":  function(d) { return d[0]+d[1] } },
+    {"name": "type", "symbols": ["baretype", "pointer"], "postprocess":  function(d) { return d[0][0] + d[1] } },
     {"name": "integer", "symbols": [/[0-9\-]/], "postprocess":  id },
     {"name": "integer", "symbols": ["integer", /[0-9]/], "postprocess":  function(d) { return "" + d[0] + d[1] } },
     {"name": "floating", "symbols": ["integer", {"literal":"."}, "integer"], "postprocess":  function(d) { return +(d[0]+d[1]+d[2]) } },

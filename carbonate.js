@@ -112,15 +112,18 @@ fs.readFile(process.argv[2], function(err, content) {
   output.push("}");
 
   if(!(initExists && loopExists)) {
+    fs.writeFileSync("badsoda.js", output.join("\n"));
+
     die("init and/or loop don't exist",
-        "Please define these functions to produce working Soda");
+        "Please define these functions to produce working Soda",
+        "If this behaviour was desired, partial code is in badsoda.js");
   }
 
   fs.writeFile("testsoda.js", output.join("\n"));
 })
 
 function declarationCoercion(type, name) {
-  if(type == "int") {
+  if(type == "int" || type.indexOf("*") > -1) {
     return "var "+name+" = 0;";
   } else if(type == "double") {
     return "var "+name+" = 0.0;";
@@ -131,7 +134,7 @@ function declarationCoercion(type, name) {
 
 function parameterCoercion(type, name) {
   // TODO: more types
-  if(type == "int") {
+  if(type == "int" || type.indexOf("*") > -1) {
     return name+" = "+name+"|0;";
   } else if(type == "double") {
     return name+" = +"+name+";";
@@ -141,7 +144,7 @@ function parameterCoercion(type, name) {
 }
 
 function returnedCoercion(call, type) {
-  if(type == "int") {
+  if(type == "int" || type.indexOf("*") > -1) {
     return call+"|0";
   } else if(type == "double") {
     return "+"+call;
@@ -152,13 +155,13 @@ function returnedCoercion(call, type) {
 
 function returnCoercion(value, type) {
   // TODO: more types
-  if(type == "int") {
+  if(type == "int" || type.indexOf("*") > -1) {
     return "return ("+value+")|0;";
   } else if(type == "double") {
     return "return +("+value+")";
   }
 
-  die("Unknown return type: ", type, name);
+  die("Unknown return type: ", type, value);
 }
 
 function compileArithm(exp, localContext, globalContext, op) {
@@ -195,7 +198,9 @@ function compileExpression(exp, localContext, globalContext) {
   } else if( (exp * 1) == exp) {
     return [exp, "fixnum"];
   } else if( localContext[exp] || globalContext[exp]) {
-    return [exp, (localContext[exp] && localContext.type) || globalContext[exp].type];
+    return [exp, (!!localContext[exp]) ? localContext.type
+              :  (!!globalContext[exp]) ? globalContext[exp].type
+              :  console.error("Ahhh "+exp)];
   } else {
     die("Unknown expression: ", exp);
   }

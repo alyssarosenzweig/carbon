@@ -15,7 +15,10 @@ program -> globalLine _ {% function(d) { return [d[0]] } %}
         | program globalLine _ {% function(d) { return d[0].concat([d[1]]) }%}
 
 baretype -> "int" | "double" | "void"
-type -> baretype {% doubleonly %}
+pointer -> null {% function() { return "" } %}
+            | "*" pointer {% function(d) { return d[0]+d[1] } %}
+
+type -> baretype pointer {% function(d) { return d[0][0] + d[1] } %}
 
 integer -> [0-9\-] {% id %}
           | integer [0-9] {% function(d) { return "" + d[0] + d[1] } %}
