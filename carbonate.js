@@ -13,6 +13,8 @@ var globalContext = {};
 var initCode = [];
 var localContext = {};
 
+var functionLookup = {};
+
 var initExists = false, loopExists = false;
 
 var globalStatement;
@@ -21,6 +23,16 @@ fs.readFile(process.argv[2], function(err, content) {
   var tokens = parser.feed(content.toString()).results[0];
 
   var functionList = [];
+
+  // iterate to find functions AOT
+  tokens.map(function(gs) {
+    if(gs[0] == "func") {
+      console.log(gs);
+      functionLookup[gs[2]] = {
+        return: gs[1]
+      }
+    }
+  })
 
   tokens.map(function(gs) {
     globalStatement = gs;
@@ -128,6 +140,16 @@ function parameterCoercion(type, name) {
   die("Unknown parameter type: ", type, name);
 }
 
+function returnedCoercion(call, type) {
+  if(type == "int") {
+    return call+"|0";
+  } else if(type == "double") {
+    return "+"+call;
+  }
+
+  die("Unknown type returned from function", type, call);
+}
+
 function returnCoercion(value, type) {
   // TODO: more types
   if(type == "int") {
@@ -168,6 +190,8 @@ function compileExpression(exp, localContext, globalContext) {
     return compileArithm(exp, localContext, globalContext, "-");
   } else if(exp[0] == "+" && Array.isArray(exp)) { // addition vs unary positive
     return compileArithm(exp, localContext, globalContext, "+");
+  } else if(exp[0] == "call") {
+    return generateFunctionCall(exp);
   } else if( (exp * 1) == exp) {
     return [exp, "fixnum"];
   } else if( localContext[exp] || globalContext[exp]) {
@@ -272,6 +296,11 @@ function compileBlock(block) {
       die("Unknown statement in function body", statement);
     }
   })
+}
+
+function generateFunctionCall(call) {
+  var func = functionLookup[call[1]];
+  return ["("+returnedCoercion(call[1]+"()", func.return)+")", func.return];
 }
 
 // reports an error message and dies
