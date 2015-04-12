@@ -1,3 +1,9 @@
+/*
+colors.c
+Simple demo of Carbon
+Loop returns a value 0-1 used to set the screen color
+*/
+
 double greyColor = 0.0;
 double speed = 0.01;
 double direction = 1;

@@ -4,11 +4,14 @@
 function id(x) {return x[0]; }
  function only(d) { return d[0] } 
  function doubleonly(d) { return d[0][0] } 
- function flat(d) { return d[1].concat(d[0]) } var grammar = {
+ function flat(d) { return d[1].concat(d[0]) } 
+ function nullify(d) { return null } var grammar = {
     ParserRules: [
     {"name": "main", "symbols": ["_", "program"], "postprocess":  function(d) { return d[1] } },
     {"name": "globalLine", "symbols": ["function"], "postprocess":  id },
     {"name": "globalLine", "symbols": ["declaration", {"literal":";"}], "postprocess":  id },
+    {"name": "globalLine", "symbols": ["BlockComment"], "postprocess":  id },
+    {"name": "globalLine", "symbols": ["LineComment"], "postprocess":  id },
     {"name": "program", "symbols": ["globalLine", "_"], "postprocess":  function(d) { return [d[0]] } },
     {"name": "program", "symbols": ["program", "globalLine", "_"], "postprocess":  function(d) { return d[0].concat([d[1]]) }},
     {"name": " string$1", "symbols": [{"literal":"i"}, {"literal":"n"}, {"literal":"t"}], "postprocess": function joiner(d) {
@@ -100,6 +103,17 @@ function id(x) {return x[0]; }
         return d.join('');
     }},
     {"name": "return", "symbols": ["_", " string$14", "value"], "postprocess":  function(d) { return ["return", d[2]] } },
+    {"name": " string$15", "symbols": [{"literal":"/"}, {"literal":"*"}], "postprocess": function joiner(d) {
+        return d.join('');
+    }},
+    {"name": " string$16", "symbols": [{"literal":"*"}, {"literal":"/"}], "postprocess": function joiner(d) {
+        return d.join('');
+    }},
+    {"name": "BlockComment", "symbols": [" string$15", "commentbody", " string$16"], "postprocess":  function(d) { return ["comment"] } },
+    {"name": " string$17", "symbols": [{"literal":"/"}, {"literal":"/"}], "postprocess": function joiner(d) {
+        return d.join('');
+    }},
+    {"name": "LineComment", "symbols": [" string$17", "LineEnd"], "postprocess":  function(d) { return ["comment"]} },
     {"name": "function", "symbols": ["type", {"literal":" "}, "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "_", "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["func", d[0], d[2], d[6], d[12]] }},
     {"name": "function", "symbols": ["type", {"literal":" "}, "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "_", {"literal":"}"}], "postprocess":  function(d) { return ["func", d[0], d[2], d[6], []] } },
     {"name": "param", "symbols": ["type", {"literal":" "}, "word"], "postprocess":  function(d) { return [d[0], d[2]] } },
@@ -112,8 +126,15 @@ function id(x) {return x[0]; }
     {"name": "statement", "symbols": ["return", {"literal":";"}], "postprocess":  id },
     {"name": "statement", "symbols": ["assignment", {"literal":";"}], "postprocess":  id },
     {"name": "statement", "symbols": ["_", "IfStatement"], "postprocess":  function(d) { return d[1] } },
-    {"name": "_", "symbols": [], "postprocess":  function(d) { return null } },
-    {"name": "_", "symbols": [/[\s]/, "_"], "postprocess":  function(d) { return null } }
+    {"name": "statement", "symbols": ["BlockComment"], "postprocess":  id },
+    {"name": "statement", "symbols": ["LineComment"], "postprocess":  id },
+    {"name": "_", "symbols": [], "postprocess":  nullify },
+    {"name": "_", "symbols": [/[\s]/, "_"], "postprocess":  nullify },
+    {"name": "commentbody", "symbols": [], "postprocess":  nullify },
+    {"name": "commentbody", "symbols": [/[^\*]/, "commentbody"], "postprocess":  nullify },
+    {"name": "commentbody", "symbols": [{"literal":"*"}, /[^\/]/, "commentbody"], "postprocess":  nullify },
+    {"name": "LineEnd", "symbols": [], "postprocess":  nullify },
+    {"name": "LineEnd", "symbols": [/[^\n]/, "LineEnd"], "postprocess":  nullify }
 ]
   , ParserStart: "main"
 }

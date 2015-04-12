@@ -82,6 +82,8 @@ fs.readFile(process.argv[2], function(err, content) {
       if(globalStatement[3] != 0) {
         initCode.push(["assignment", globalStatement[2], "=", globalStatement[3]]);
       }
+    } else if(globalStatement[0] == "comment") {
+      /* no comment */
     } else {
       die("Unknown global statement: "+globalStatement);
     }
@@ -264,6 +266,8 @@ function compileBlock(block) {
       } else {
         die("Unknown double nested statement in function body", statement);
       }
+    } else if(stmt[0] == "comment") {
+      /* no comment */
     } else {
       die("Unknown statement in function body", statement);
     }

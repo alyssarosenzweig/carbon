@@ -1,11 +1,16 @@
 @{% function only(d) { return d[0] } %}
 @{% function doubleonly(d) { return d[0][0] } %}
 @{% function flat(d) { return d[1].concat(d[0]) } %}
+@{% function nullify(d) { return null } %}
 
 # main
 main -> _ program {% function(d) { return d[1] } %}
 
-globalLine -> function {% id %} | declaration ";" {% id %}
+globalLine -> function {% id %}
+            | declaration ";" {% id %}
+            | BlockComment {% id %}
+            | LineComment {% id %}
+
 program -> globalLine _ {% function(d) { return [d[0]] } %}
         | program globalLine _ {% function(d) { return d[0].concat([d[1]]) }%}
 
@@ -68,6 +73,9 @@ conditional -> conditionals {% function(d) { return d[0][0] } %}
 
 return -> _ "return " value {% function(d) { return ["return", d[2]] } %}
 
+BlockComment -> "/*" commentbody "*/" {% function(d) { return ["comment"] } %}
+LineComment -> "//" LineEnd {% function(d) { return ["comment"]} %}
+
 function -> type " " word _ "(" _ params _ ")" _ "{" _ block _ "}"
             {% function(d) { return ["func", d[0], d[2], d[6], d[12]] }%}
           | type " " word _ "(" _ params _ ")" _ "{" _ "}"
@@ -81,7 +89,16 @@ statement -> declaration ";" {% id %}
             | return ";"  {% id %}
             | assignment ";" {% id %}
             | _ IfStatement {% function(d) { return d[1] } %}
+            | BlockComment {% id %}
+            | LineComment {% id %}
 
 # whitespace
-_ -> null {% function(d) { return null } %}
-    | [\s] _ {% function(d) { return null } %}
+_ -> null {% nullify %}
+    | [\s] _ {% nullify %}
+
+commentbody -> null {% nullify %}
+    | [^\*] commentbody {% nullify %}
+    | "*" [^\/] commentbody {% nullify %}
+
+LineEnd -> null {% nullify %}
+          | [^\n] LineEnd {% nullify %}
