@@ -93,6 +93,7 @@ statement -> declaration ";" {% id %}
             | return ";"  {% id %}
             | assignment ";" {% id %}
             | _ IfStatement {% function(d) { return d[1] } %}
+            | FunctionCall {% id %}
             | BlockComment {% id %}
             | LineComment {% id %}
 

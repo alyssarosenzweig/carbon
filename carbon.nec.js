@@ -128,6 +128,7 @@ function id(x) {return x[0]; }
     {"name": "statement", "symbols": ["return", {"literal":";"}], "postprocess":  id },
     {"name": "statement", "symbols": ["assignment", {"literal":";"}], "postprocess":  id },
     {"name": "statement", "symbols": ["_", "IfStatement"], "postprocess":  function(d) { return d[1] } },
+    {"name": "statement", "symbols": ["FunctionCall"], "postprocess":  id },
     {"name": "statement", "symbols": ["BlockComment"], "postprocess":  id },
     {"name": "statement", "symbols": ["LineComment"], "postprocess":  id },
     {"name": "_", "symbols": [], "postprocess":  nullify },
