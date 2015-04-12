@@ -13,7 +13,30 @@
       container: document.body
     });
 
-    ctx.initWebGL(1024, 768);
+    ctx.initWebGL(1024, 768, {
+      "vert": {
+        type: "vertex",
+        source:
+        [
+        "attribute vec3 aVertexPosition;",
+        "uniform mat4 uMVMatrix;",
+        "uniform mat4 uPMatrix;",
+        "",
+        "void main(void) {",
+        "  gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);",
+        "}",
+        ]
+      },
+      "frag": {
+        type: "fragment",
+        source:
+        [
+        "void main(void) {",
+        "  gl_FragColor = vec4(1.0, 0.5, 0.0, 1.0);",
+        "}"
+        ]
+      }
+    });
 
     drink = Soda(window, null, null);
     drink.init();
@@ -23,9 +46,24 @@
 
   function loop() {
     var value = drink.loop();
+    
+    var cx = value;
+    var cy = cx;
 
     ctx.gl.clearColor(value, value, value, 1.0);
     ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
+
+    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, ctx.squareBuffer);
+    ctx.gl.vertexAttribPointer(ctx.gl.vertPosAttr, 3, ctx.gl.FLOAT, false, 0, 0);
+
+    var pUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uPMatrix");
+    ctx.gl.uniformMatrix4fv(pUniform, false, new Float32Array([1.8106601717798214, 0, 0, 0, 0, 2.4142135623730954, 0, 0, 0, 0, -1.002002002002002, -1, 0, 0, -0.20020020020020018, 0]));
+
+    var mvUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uMVMatrix");
+    ctx.gl.uniformMatrix4fv(mvUniform, false, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, cx, cy, -6, 1]);
+
+    ctx.gl.drawArrays(ctx.gl.TRIANGLE_STRIP, 0, 4);
+
 
     requestAnimationFrame(loop);
   }
