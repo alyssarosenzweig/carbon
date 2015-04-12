@@ -237,7 +237,7 @@ function fixnum(num, type) {
   if( (num * 1) == num) {
     if(type == "double") {
       return "+"+num;
-    } else if(type == "int") {
+    } else if(type == "int" || type.indexOf("*") > -1) {
       return "("+num+"|0)";
     } else {
       console.warn("Cannot fix "+num+" to "+type);
@@ -249,6 +249,11 @@ function fixnum(num, type) {
 }
 
 function contextType(n) {
+  if(n[0] == "*") {
+    var depth = n.split("*").length - 1;
+    return contextType(n.slice(depth));
+  }
+
   if(globalContext[n])
     return globalContext[n].type;
   if(localContext[n])
