@@ -93,7 +93,7 @@ fs.readFile(process.argv[2], function(err, content) {
         source: "decl"
       }
 
-      if(globalStatement[3] != 0) {
+      if(!!globalStatement[3] && globalStatement[3] != 0) {
         initCode.push(["assignment", globalStatement[2], "=", globalStatement[3]]);
       }
     } else if(globalStatement[0] == "comment") {
@@ -315,7 +315,7 @@ function compileBlock(block) {
         source: "decl"
       }
 
-      if(statement[3] != 0) {
+      if(!!statement[3] && statement[3] != 0) {
         var c = compileExpression(statement[3], localContext, globalContext);
         output.push(statement[2]+"="+fixnum(c[0], statement[1]));
       }
