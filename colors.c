@@ -17,7 +17,7 @@ double velocity() {
 }
 
 double loop() {
-  greyColor = greyColor + velocity();
+  greyColor += velocity();
 
   if(greyColor > 1.0) {
     direction *= -1;
