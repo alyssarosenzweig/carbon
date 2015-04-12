@@ -286,7 +286,7 @@ function compileBlock(block) {
         var type = contextType(bareName);
         var bareType = type.slice(0, type.length - depth);
 
-        lvalue = heapForType(bareType)+"[("+lvalue+")"+addressHeap(bareType)+"]";
+        lvalue = heapForType(bareType)+"[("+bareName+")"+addressHeap(bareType)+"]";
 
         while(--depth) {
           lvalue = heapForType("void*")+"[("+lvalue+")"+addressHeap("void*")+"]";
