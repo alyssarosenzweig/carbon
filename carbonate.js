@@ -180,7 +180,7 @@ function compileArithm(exp, localContext, globalContext, op) {
 function compileExpression(exp, localContext, globalContext) {
   if(exp[0] == "/") {
     return compileArithm(exp, localContext, globalContext, "/");
-  } else if(exp[0] == "*") {
+  } else if(exp[0] == "*" && Array.isArray(exp)) { // multiplication vs pointer dereferencing
     var leftOp = compileExpression(exp[1], localContext, globalContext),
         rightOp = compileExpression(exp[2], localContext, globalContext);
 
@@ -197,8 +197,8 @@ function compileExpression(exp, localContext, globalContext) {
     return generateFunctionCall(exp);
   } else if( (exp * 1) == exp) {
     return [exp, "fixnum"];
-  } else if( localContext[exp] || globalContext[exp]) {
-    return [exp, contextType(exp)];
+  } else if( localContext[stripChar(exp, "*")] || globalContext[stripChar(exp, "*")]) {
+    return [dereference(exp), contextType(exp)];
   } else {
     die("Unknown expression: ", exp);
   }
@@ -388,6 +388,20 @@ function addressHeap(type) {
 
   console.error("Unknown heap shift for type "+type);
   return "";
+}
+
+function stripChar(word, s) {
+  return word.replace(s, "");
+}
+
+function dereference(exp) {
+  if(exp.indexOf("*") == -1) return exp;
+
+  var depth = exp.split("*").length - 1;
+  var bare = exp.slice(depth);
+
+  // TODO: dereferencing logic
+  return bare;
 }
 
 // reports an error message and dies
