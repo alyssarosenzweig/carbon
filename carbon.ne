@@ -50,7 +50,10 @@ AS -> AS _ "+" _ MD {% function(d) { return ["+", d[0], d[4]]} %}
 
 # number
 N -> number {% id %}
-    | word {% id %}
+    | variable {% id %}
+
+variable -> word {% id %} |
+        "*" variable {% function(d) { return d[0] + d[1] } %}
 
 value -> AS {% id %}
 
@@ -59,7 +62,7 @@ declInit -> declUndef _ "=" _ value {% function(d) { return [d[0][0], d[0][1], d
 declaration -> declInit {% id %}
               | declUndef {% id %}
 
-assignment -> word _ assignmentOperator _ value {% function(d) { return ["assignment", d[0], d[2], d[4]] } %}
+assignment -> variable _ assignmentOperator _ value {% function(d) { return ["assignment", d[0], d[2], d[4]] } %}
 assignmentOperator -> "=" {% id %}
                     | "+=" {% id %}
                     | "-=" {% id %}
@@ -100,7 +103,7 @@ paramvals -> null | paramval | paramvals _ "," _ paramval {% function(d) { retur
 block -> statement | block statement {% function(d) { return d[0].concat([d[1]])} %}
 statement -> declaration ";" {% id %}
             | return ";"  {% id %}
-            | assignment ";" {% id %}
+            | _ assignment ";" {% id %}
             | _ IfStatement {% function(d) { return d[1] } %}
             | _ WhileLoop {% function(d) { return d[1] } %}
             | _ ForLoop {% function(d) { return d[1] } %}
