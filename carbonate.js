@@ -167,22 +167,19 @@ function returnCoercion(value, type) {
 }
 
 function compileArithm(exp, localContext, globalContext, op) {
-  console.log(exp);
-
   var leftOp = compileExpression(exp[1], localContext, globalContext),
       rightOp = compileExpression(exp[2], localContext, globalContext);
 
   var cross = crossFixnum(leftOp, rightOp);
   var o = "("+cross[0]+op+cross[1]+")";
 
-  return [o, cross[2]];
+  return [fixnum(o, cross[2]), cross[2]];
 }
 
 function compileExpression(exp, localContext, globalContext) {
   if(exp[0] == "/") {
     return compileArithm(exp, localContext, globalContext, "/");
   } else if(exp[0] == "*") {
-    // TODO: multiplication of doubles
     var leftOp = compileExpression(exp[1], localContext, globalContext),
         rightOp = compileExpression(exp[2], localContext, globalContext);
 
@@ -200,9 +197,7 @@ function compileExpression(exp, localContext, globalContext) {
   } else if( (exp * 1) == exp) {
     return [exp, "fixnum"];
   } else if( localContext[exp] || globalContext[exp]) {
-    return [exp, (!!localContext[exp]) ? localContext.type
-              :  (!!globalContext[exp]) ? globalContext[exp].type
-              :  console.error("Ahhh "+exp)];
+    return [exp, contextType(exp)];
   } else {
     die("Unknown expression: ", exp);
   }
@@ -232,11 +227,25 @@ function crossFixnum(left, right) {
     }
   }
 
-  return [left[0], right[0]];
+  if(left[1] == "int") {
+    left[0] = "("+left[0]+"|0)";
+  } else if(left[1] == "double") {
+    left[0] = "+("+left[0]+")";
+  }
+
+  if(right[1] == "int") {
+    right[0] = "("+right[0]+"|0)";
+  } else if(right[1] == "double") {
+    right[0] = "+("+right[0]+")";
+  }
+
+  console.log(left+","+right);
+
+  return [left[0], right[0], left[1]];
 }
 
 function fixnum(num, type) {
-  if( (num * 1) == num) {
+  //if( (num * 1) == num) {
     if(type == "double") {
       return "+"+num;
     } else if(type == "int" || type.indexOf("*") > -1) {
@@ -245,7 +254,7 @@ function fixnum(num, type) {
       console.warn("Cannot fix "+num+" to "+type);
       return num;
     }
-  }
+//  }
 
   return num;
 }
@@ -274,10 +283,6 @@ function compileBlock(block) {
     } else if(statement[0] == "assignment") {
       var c = compileExpression(statement[3], localContext, globalContext);
 
-      if(statement[2].length == 2 && statement[2][1] == "=") {
-        statement[2] = "="+statement[1]+statement[2][0];
-      }
-
       var lvalue = statement[1];
 
       if(statement[1][0] == "*") {
@@ -291,6 +296,13 @@ function compileBlock(block) {
         while(--depth) {
           lvalue = heapForType("void*")+"[("+lvalue+")"+addressHeap("void*")+"]";
         }
+      }
+
+      if(statement[2].length == 2 && statement[2][1] == "=") {
+        var expa = compileExpression([statement[2][0], statement[1], c[0]],
+                    localContext, globalContext);
+        output.push(lvalue+"="+expa[0]);
+        return;
       }
 
       output.push(lvalue+statement[2]+fixnum(c[0], contextType(statement[1])));
@@ -342,7 +354,15 @@ function compileBlock(block) {
 
 function generateFunctionCall(call) {
   var func = functionLookup[call[1]];
-  return ["("+returnedCoercion(call[1]+"()", func.return)+")", func.return];
+  var params = "";
+
+  call[2].forEach(function(p) {
+      params += p+",";
+  })
+
+  if(params.length > 1) params = params.slice(0, -1);
+
+  return ["("+returnedCoercion(call[1]+"("+params+")", func.return)+")", func.return];
 }
 
 function heapForType(type) {

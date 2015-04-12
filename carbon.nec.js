@@ -131,7 +131,7 @@ function id(x) {return x[0]; }
     {"name": "function", "symbols": ["type", {"literal":" "}, "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["func", d[0], d[2], d[6], d[11]] }},
     {"name": "function", "symbols": ["type", {"literal":" "}, "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "_", {"literal":"}"}], "postprocess":  function(d) { return ["func", d[0], d[2], d[6], []] } },
     {"name": "param", "symbols": ["type", {"literal":" "}, "word"], "postprocess":  function(d) { return [d[0], d[2]] } },
-    {"name": "paramvals", "symbols": ["value"], "postprocess":  id },
+    {"name": "paramval", "symbols": ["value"], "postprocess":  id },
     {"name": "params", "symbols": []},
     {"name": "params", "symbols": ["param"]},
     {"name": "params", "symbols": ["params", "_", {"literal":","}, "_", "param"], "postprocess":  function(d){ return d[0].concat([d[4]])} },

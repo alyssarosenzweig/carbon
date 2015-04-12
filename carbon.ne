@@ -97,7 +97,7 @@ function -> type " " word _ "(" _ params _ ")" _ "{" block _ "}"
             {% function(d) { return ["func", d[0], d[2], d[6], []] } %}
 
 param -> type " " word {% function(d) { return [d[0], d[2]] } %}
-paramvals -> value {% id %}
+paramval -> value {% id %}
 params -> null | param | params _ "," _ param {% function(d){ return d[0].concat([d[4]])} %}
 paramvals -> null | paramval | paramvals _ "," _ paramval {% function(d) { return d[0].concat([d[4]])} %}
 block -> statement | block statement {% function(d) { return d[0].concat([d[1]])} %}
