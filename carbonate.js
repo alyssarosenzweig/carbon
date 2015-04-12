@@ -7,6 +7,8 @@ var output = [
   "function Soda(stdlib, foreign, buffer) {",
     '"use asm";',
     "var MathImul = stdlib.Math.imul;",
+    "var HEAP32 = new stdlib.Int32Array(buffer);",
+    "var HEAPD64 = new stdlib.Float64Array(buffer);"
 ];
 
 var globalContext = {};
@@ -276,7 +278,22 @@ function compileBlock(block) {
         statement[2] = "="+statement[1]+statement[2][0];
       }
 
-      output.push(statement[1]+statement[2]+fixnum(c[0], contextType(statement[1])));
+      var lvalue = statement[1];
+
+      if(statement[1][0] == "*") {
+        var depth = statement[1].split("*").length - 1;
+        var bareName = statement[1].slice(depth);
+        var type = contextType(bareName);
+        var bareType = type.slice(0, type.length - depth);
+
+        lvalue = heapForType(bareType)+"[("+lvalue+")"+addressHeap(bareType)+"]";
+
+        while(--depth) {
+          lvalue = heapForType("void*")+"[("+lvalue+")"+addressHeap("void*")+"]";
+        }
+      }
+
+      output.push(lvalue+statement[2]+fixnum(c[0], contextType(statement[1])));
     } else if(statement[0] == "decl") {
       output.push(declarationCoercion(statement[1], statement[2]));
 
@@ -326,6 +343,32 @@ function compileBlock(block) {
 function generateFunctionCall(call) {
   var func = functionLookup[call[1]];
   return ["("+returnedCoercion(call[1]+"()", func.return)+")", func.return];
+}
+
+function heapForType(type) {
+  if(type == "int" || type == "void*") {
+    return "HEAP32";
+  }
+
+  if(type == "double") {
+    return "HEAPD64";
+  }
+
+  console.error("Unknown heap for type "+type);
+  return "HEAP32";
+}
+
+function addressHeap(type) {
+  if(type == "int" || type == "void*") {
+    return ">>2";
+  }
+
+  if(type == "double") {
+    return ">>3";
+  }
+
+  console.error("Unknown heap shift for type "+type);
+  return "";
 }
 
 // reports an error message and dies
