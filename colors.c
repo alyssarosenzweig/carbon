@@ -12,8 +12,12 @@ void init() {
 
 }
 
+double velocity() {
+  return speed * direction;
+}
+
 double loop() {
-  greyColor = greyColor + speed * direction;
+  greyColor = greyColor + velocity();
 
   if(greyColor > 1.0) {
     direction *= -1;

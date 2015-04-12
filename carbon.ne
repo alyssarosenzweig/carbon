@@ -25,11 +25,15 @@ number -> floating {% id %} | integer {% id %}
 word -> [A-Za-z] {% id %}
         | word [A-Za-z0-9] {% function(d) { return "" + d[0] + d[1] } %}
 
+FunctionCall -> word "(" _ params _ ")"
+                {% function(d) { return ["call", d[0], d[3]] } %}
+
 # order of operations
 
 # parans
 P -> "(" _ AS _ ")" {% function(d) { return d[2] } %}
     | N {% id %}
+    | FunctionCall {% id %}
 
 # multiplication + division
 MD -> MD _ "*" _ P {% function(d) { return ["*", d[0], d[4]] } %}
