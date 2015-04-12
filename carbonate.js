@@ -217,7 +217,7 @@ function crossFixnum(left, right) {
   if(left[1] == "fixnum" && ["double", "int"].indexOf(right[1]) > -1) {
     return [fixnum(left[0], right[1]), right[0], right[1]];
   } else if(right[1] == "fixnum" && ["double", "int"].indexOf(left[1]) > -1) {
-    return [left[0], fixnum(right[0], left[1]), right[1]];
+    return [left[0], fixnum(right[0], left[1]), left[1]];
   } else if(right[1] == left[1] && right[1] == "fixnum") {
     if( ((right[0]|0) != right[0]) || ((left[0]|0) != left[0]) ) {
       return ["+"+left[0], "+"+right[0], "double"];
@@ -250,7 +250,7 @@ function fixnum(num, type) {
     } else if(type == "int" || type.indexOf("*") > -1) {
       return "("+num+"|0)";
     } else {
-      console.warn("Cannot fix "+num+" to "+type);
+      console.trace("Cannot fix "+num+" to "+type);
       return num;
     }
 //  }
@@ -259,6 +259,8 @@ function fixnum(num, type) {
 }
 
 function contextType(n) {
+  n = n.toString();
+
   if(n[0] == "*") {
     var depth = n.split("*").length - 1;
     return contextType(n.slice(depth));
@@ -353,6 +355,13 @@ function compileBlock(block) {
 
 function generateFunctionCall(call) {
   var func = functionLookup[call[1]];
+
+  if(call[1] == "int2double") {
+    return ["+("+compileExpression(call[2], localContext, globalContext)[0]+"|0)", "double"];
+  } else if(call[1] == "double2int") {
+    return ["(~~(+"+compileExpression(call[2], localContext, globalContext)[0]+")|0)", "int"];
+  }
+
   var params = "";
 
   call[2].forEach(function(p) {
@@ -391,10 +400,12 @@ function addressHeap(type) {
 }
 
 function stripChar(word, s) {
-  return word.replace(s, "");
+  return word.toString().replace(s, "");
 }
 
 function dereference(exp) {
+  exp = exp.toString();
+
   if(exp.indexOf("*") == -1) return exp;
 
   var depth = exp.split("*").length - 1;
