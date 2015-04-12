@@ -76,11 +76,11 @@ function id(x) {return x[0]; }
     {"name": "IfStatement", "symbols": ["bareifStatement"]},
     {"name": "IfStatement", "symbols": ["elseIfStatement"]},
     {"name": "ElseBlock", "symbols": ["IfStatement"], "postprocess":  id },
-    {"name": "ElseBlock", "symbols": [{"literal":"{"}, "_", "block", "_", {"literal":"}"}], "postprocess":  function(d) { return d[2] } },
+    {"name": "ElseBlock", "symbols": [{"literal":"{"}, "block", "_", {"literal":"}"}], "postprocess":  function(d) { return d[1] } },
     {"name": " string$8", "symbols": [{"literal":"i"}, {"literal":"f"}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "bareifStatement", "symbols": [" string$8", "_", {"literal":"("}, "_", "condition", "_", {"literal":")"}, "_", {"literal":"{"}, "_", "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["if", d[4], d[10]] } },
+    {"name": "bareifStatement", "symbols": [" string$8", "_", {"literal":"("}, "_", "condition", "_", {"literal":")"}, "_", {"literal":"{"}, "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["if", d[4], d[9]] } },
     {"name": " string$9", "symbols": [{"literal":"e"}, {"literal":"l"}, {"literal":"s"}, {"literal":"e"}], "postprocess": function joiner(d) {
         return d.join('');
     }},
@@ -123,12 +123,12 @@ function id(x) {return x[0]; }
     {"name": " string$18", "symbols": [{"literal":"w"}, {"literal":"h"}, {"literal":"i"}, {"literal":"l"}, {"literal":"e"}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "WhileLoop", "symbols": [" string$18", "_", {"literal":"("}, "_", "condition", "_", {"literal":")"}, "_", {"literal":"{"}, "_", "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["while", d[4], d[10]] } },
+    {"name": "WhileLoop", "symbols": [" string$18", "_", {"literal":"("}, "_", "condition", "_", {"literal":")"}, "_", {"literal":"{"}, "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["while", d[4], d[9]] } },
     {"name": " string$19", "symbols": [{"literal":"f"}, {"literal":"o"}, {"literal":"r"}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "ForLoop", "symbols": [" string$19", "_", {"literal":"("}, "_", "assignment", {"literal":";"}, "_", "condition", {"literal":";"}, "_", "assignment", "_", {"literal":")"}, "_", {"literal":"{"}, "_", "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["for", d[4], d[7], d[10], d[16]] } },
-    {"name": "function", "symbols": ["type", {"literal":" "}, "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "_", "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["func", d[0], d[2], d[6], d[12]] }},
+    {"name": "ForLoop", "symbols": [" string$19", "_", {"literal":"("}, "_", "assignment", {"literal":";"}, "_", "condition", {"literal":";"}, "_", "assignment", "_", {"literal":")"}, "_", {"literal":"{"}, "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["for", d[4], d[7], d[10], d[15]] } },
+    {"name": "function", "symbols": ["type", {"literal":" "}, "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["func", d[0], d[2], d[6], d[11]] }},
     {"name": "function", "symbols": ["type", {"literal":" "}, "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "_", {"literal":"}"}], "postprocess":  function(d) { return ["func", d[0], d[2], d[6], []] } },
     {"name": "param", "symbols": ["type", {"literal":" "}, "word"], "postprocess":  function(d) { return [d[0], d[2]] } },
     {"name": "paramvals", "symbols": ["value"], "postprocess":  id },
@@ -142,7 +142,7 @@ function id(x) {return x[0]; }
     {"name": "block", "symbols": ["block", "statement"], "postprocess":  function(d) { return d[0].concat([d[1]])} },
     {"name": "statement", "symbols": ["declaration", {"literal":";"}], "postprocess":  id },
     {"name": "statement", "symbols": ["return", {"literal":";"}], "postprocess":  id },
-    {"name": "statement", "symbols": ["_", "assignment", {"literal":";"}], "postprocess":  id },
+    {"name": "statement", "symbols": ["_", "assignment", {"literal":";"}], "postprocess":  function(d) { return d[1] } },
     {"name": "statement", "symbols": ["_", "IfStatement"], "postprocess":  function(d) { return d[1] } },
     {"name": "statement", "symbols": ["_", "WhileLoop"], "postprocess":  function(d) { return d[1] } },
     {"name": "statement", "symbols": ["_", "ForLoop"], "postprocess":  function(d) { return d[1] } },

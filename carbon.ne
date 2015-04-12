@@ -71,9 +71,9 @@ assignmentOperator -> "=" {% id %}
 
 IfStatement -> bareifStatement | elseIfStatement
 ElseBlock -> IfStatement {% id %}
-          | "{" _ block _ "}" {% function(d) { return d[2] } %}
-bareifStatement -> "if" _ "(" _ condition _ ")" _ "{" _ block _ "}"
-                {% function(d) { return ["if", d[4], d[10]] } %}
+          | "{" block _ "}" {% function(d) { return d[1] } %}
+bareifStatement -> "if" _ "(" _ condition _ ")" _ "{" block _ "}"
+                {% function(d) { return ["if", d[4], d[9]] } %}
 elseIfStatement -> bareifStatement _ "else" _ ElseBlock
                   {% function(d) { return ["ifElse", d[0], d[4]] } %}
 
@@ -86,13 +86,13 @@ return -> _ "return " value {% function(d) { return ["return", d[2]] } %}
 BlockComment -> "/*" commentbody "*/" {% function(d) { return ["comment"] } %}
 LineComment -> "//" LineEnd {% function(d) { return ["comment"]} %}
 
-WhileLoop -> "while" _ "(" _ condition _ ")" _ "{" _ block _ "}"
-              {% function(d) { return ["while", d[4], d[10]] } %}
-ForLoop -> "for" _ "(" _ assignment ";" _ condition ";" _ assignment _ ")" _ "{" _ block _ "}"
-            {% function(d) { return ["for", d[4], d[7], d[10], d[16]] } %}
+WhileLoop -> "while" _ "(" _ condition _ ")" _ "{" block _ "}"
+              {% function(d) { return ["while", d[4], d[9]] } %}
+ForLoop -> "for" _ "(" _ assignment ";" _ condition ";" _ assignment _ ")" _ "{" block _ "}"
+            {% function(d) { return ["for", d[4], d[7], d[10], d[15]] } %}
 
-function -> type " " word _ "(" _ params _ ")" _ "{" _ block _ "}"
-            {% function(d) { return ["func", d[0], d[2], d[6], d[12]] }%}
+function -> type " " word _ "(" _ params _ ")" _ "{" block _ "}"
+            {% function(d) { return ["func", d[0], d[2], d[6], d[11]] }%}
           | type " " word _ "(" _ params _ ")" _ "{" _ "}"
             {% function(d) { return ["func", d[0], d[2], d[6], []] } %}
 
@@ -103,7 +103,7 @@ paramvals -> null | paramval | paramvals _ "," _ paramval {% function(d) { retur
 block -> statement | block statement {% function(d) { return d[0].concat([d[1]])} %}
 statement -> declaration ";" {% id %}
             | return ";"  {% id %}
-            | _ assignment ";" {% id %}
+            | _ assignment ";" {% function(d) { return d[1] } %}
             | _ IfStatement {% function(d) { return d[1] } %}
             | _ WhileLoop {% function(d) { return d[1] } %}
             | _ ForLoop {% function(d) { return d[1] } %}
