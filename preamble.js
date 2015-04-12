@@ -4,7 +4,7 @@ var fountain = function(ctx) {
   ctx.init = function(recipe) {
     ctx.heap = new ArrayBuffer(ctx.MEMORY_SIZE);
 
-    ctx.drink = recipe(window, null, heap);
+    ctx.drink = recipe(window, null, ctx.heap);
     ctx.drink.init();
   }
 

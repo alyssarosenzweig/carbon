@@ -38,12 +38,14 @@
       }
     });
 
-    program = fountain(Soda);
+    program = fountain({});
+    program.init(Soda);
+    
     requestAnimationFrame(loop);
   }
 
   function loop() {
-    var value = fountain.drink.loop();
+    var value = program.drink.loop();
 
     var cx = value;
     var cy = cx;
