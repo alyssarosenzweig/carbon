@@ -240,8 +240,6 @@ function crossFixnum(left, right) {
     right[0] = "+("+right[0]+")";
   }
 
-  console.log(left+","+right);
-
   return [left[0], right[0], left[1]];
 }
 
