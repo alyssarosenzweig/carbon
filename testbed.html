@@ -6,10 +6,10 @@
 
   <script>
 
-  var drink, ctx;
+  var drink, ctx, program;
 
   window.onload = function() {
-    ctx = carbon({
+    ctx = carbonGL({
       container: document.body
     });
 
@@ -38,14 +38,12 @@
       }
     });
 
-    drink = Soda(window, null, null);
-    drink.init();
-
+    program = fountain(Soda);
     requestAnimationFrame(loop);
   }
 
   function loop() {
-    var value = drink.loop();
+    var value = fountain.drink.loop();
 
     var cx = value;
     var cy = cx;

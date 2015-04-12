@@ -1,12 +1,25 @@
+var fountain = function(ctx) {
+  ctx.MEMORY_SIZE = 1024 * 1024; // 1MB (enough for small demoes)
+
+  ctx.init = function(recipe) {
+    ctx.heap = new ArrayBuffer(ctx.MEMORY_SIZE);
+
+    ctx.drink = recipe(window, null, heap);
+    ctx.drink.init();
+  }
+
+  return ctx;
+}
+
 /* ctx is an object in the form of:
 {
-  container: document.body
+  container: document.body,
 }.
 
 function carbon returns a modified ctx
 */
 
-var carbon = function(ctx) {
+var carbonGL = function(ctx) {
   /* initialize rending context */
 
   ctx.initWebGL = function (width, height, shaders) {
