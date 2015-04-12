@@ -48,42 +48,58 @@ function id(x) {return x[0]; }
     {"name": "declaration", "symbols": ["declUndef"], "postprocess":  id },
     {"name": "assignment", "symbols": ["word", "_", "assignmentOperator", "_", "value"], "postprocess":  function(d) { return ["assignment", d[0], d[2], d[4]] } },
     {"name": "assignmentOperator", "symbols": [{"literal":"="}], "postprocess":  id },
+    {"name": " string$4", "symbols": [{"literal":"+"}, {"literal":"="}], "postprocess": function joiner(d) {
+        return d.join('');
+    }},
+    {"name": "assignmentOperator", "symbols": [" string$4"], "postprocess":  id },
+    {"name": " string$5", "symbols": [{"literal":"-"}, {"literal":"="}], "postprocess": function joiner(d) {
+        return d.join('');
+    }},
+    {"name": "assignmentOperator", "symbols": [" string$5"], "postprocess":  id },
+    {"name": " string$6", "symbols": [{"literal":"*"}, {"literal":"="}], "postprocess": function joiner(d) {
+        return d.join('');
+    }},
+    {"name": "assignmentOperator", "symbols": [" string$6"], "postprocess":  id },
+    {"name": " string$7", "symbols": [{"literal":"/"}, {"literal":"="}], "postprocess": function joiner(d) {
+        return d.join('');
+    }},
+    {"name": "assignmentOperator", "symbols": [" string$7"], "postprocess":  id },
     {"name": "IfStatement", "symbols": ["bareifStatement"]},
     {"name": "IfStatement", "symbols": ["elseIfStatement"]},
     {"name": "ElseBlock", "symbols": ["IfStatement"], "postprocess":  id },
     {"name": "ElseBlock", "symbols": [{"literal":"{"}, "_", "block", "_", {"literal":"}"}], "postprocess":  function(d) { return d[2] } },
-    {"name": " string$4", "symbols": [{"literal":"i"}, {"literal":"f"}], "postprocess": function joiner(d) {
+    {"name": " string$8", "symbols": [{"literal":"i"}, {"literal":"f"}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "bareifStatement", "symbols": [" string$4", "_", {"literal":"("}, "_", "condition", "_", {"literal":")"}, "_", {"literal":"{"}, "_", "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["if", d[4], d[10]] } },
-    {"name": " string$5", "symbols": [{"literal":"e"}, {"literal":"l"}, {"literal":"s"}, {"literal":"e"}], "postprocess": function joiner(d) {
+    {"name": "bareifStatement", "symbols": [" string$8", "_", {"literal":"("}, "_", "condition", "_", {"literal":")"}, "_", {"literal":"{"}, "_", "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["if", d[4], d[10]] } },
+    {"name": " string$9", "symbols": [{"literal":"e"}, {"literal":"l"}, {"literal":"s"}, {"literal":"e"}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "elseIfStatement", "symbols": ["bareifStatement", "_", " string$5", "_", "ElseBlock"], "postprocess":  function(d) { return ["ifElse", d[0], d[4]] } },
+    {"name": "elseIfStatement", "symbols": ["bareifStatement", "_", " string$9", "_", "ElseBlock"], "postprocess":  function(d) { return ["ifElse", d[0], d[4]] } },
     {"name": "condition", "symbols": ["value", "_", "conditional", "_", "value"], "postprocess":  function(d) { return [d[0], d[2], d[4]]} },
-    {"name": " string$6", "symbols": [{"literal":"="}, {"literal":"="}], "postprocess": function joiner(d) {
+    {"name": " string$10", "symbols": [{"literal":"="}, {"literal":"="}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "conditionals", "symbols": [" string$6"]},
-    {"name": " string$7", "symbols": [{"literal":">"}, {"literal":"="}], "postprocess": function joiner(d) {
+    {"name": "conditionals", "symbols": [" string$10"]},
+    {"name": " string$11", "symbols": [{"literal":">"}, {"literal":"="}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "conditionals", "symbols": [" string$7"]},
-    {"name": " string$8", "symbols": [{"literal":"<"}, {"literal":"="}], "postprocess": function joiner(d) {
+    {"name": "conditionals", "symbols": [" string$11"]},
+    {"name": " string$12", "symbols": [{"literal":"<"}, {"literal":"="}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "conditionals", "symbols": [" string$8"]},
-    {"name": " string$9", "symbols": [{"literal":"!"}, {"literal":"="}], "postprocess": function joiner(d) {
+    {"name": "conditionals", "symbols": [" string$12"]},
+    {"name": " string$13", "symbols": [{"literal":"!"}, {"literal":"="}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "conditionals", "symbols": [" string$9"]},
+    {"name": "conditionals", "symbols": [" string$13"]},
     {"name": "conditionals", "symbols": [{"literal":">"}]},
     {"name": "conditionals", "symbols": [{"literal":"<"}]},
     {"name": "conditional", "symbols": ["conditionals"], "postprocess":  function(d) { return d[0][0] } },
-    {"name": " string$10", "symbols": [{"literal":"r"}, {"literal":"e"}, {"literal":"t"}, {"literal":"u"}, {"literal":"r"}, {"literal":"n"}, {"literal":" "}], "postprocess": function joiner(d) {
+    {"name": " string$14", "symbols": [{"literal":"r"}, {"literal":"e"}, {"literal":"t"}, {"literal":"u"}, {"literal":"r"}, {"literal":"n"}, {"literal":" "}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "return", "symbols": ["_", " string$10", "value"], "postprocess":  function(d) { return ["return", d[2]] } },
+    {"name": "return", "symbols": ["_", " string$14", "value"], "postprocess":  function(d) { return ["return", d[2]] } },
     {"name": "function", "symbols": ["type", {"literal":" "}, "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "_", "block", "_", {"literal":"}"}], "postprocess":  function(d) { return ["func", d[0], d[2], d[6], d[12]] }},
     {"name": "function", "symbols": ["type", {"literal":" "}, "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "_", {"literal":"}"}], "postprocess":  function(d) { return ["func", d[0], d[2], d[6], []] } },
     {"name": "param", "symbols": ["type", {"literal":" "}, "word"], "postprocess":  function(d) { return [d[0], d[2]] } },

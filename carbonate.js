@@ -138,6 +138,8 @@ function returnCoercion(value, type) {
 }
 
 function compileArithm(exp, localContext, globalContext, op) {
+  console.log(exp);
+
   var leftOp = compileExpression(exp[1], localContext, globalContext),
       rightOp = compileExpression(exp[2], localContext, globalContext);
 
@@ -151,13 +153,18 @@ function compileExpression(exp, localContext, globalContext) {
   if(exp[0] == "/") {
     return compileArithm(exp, localContext, globalContext, "/");
   } else if(exp[0] == "*") {
+    // TODO: multiplication of doubles
     var leftOp = compileExpression(exp[1], localContext, globalContext),
         rightOp = compileExpression(exp[2], localContext, globalContext);
 
-    return "(MathImul("+leftOp+","+rightOp+")|0)";
-  } else if(exp[0] == "-") {
+    if(leftOp[1] == "double" || rightOp[1] == "double") {
+      return compileArithm(exp, localContext, globalContext, "*");
+    }
+
+    return ["(MathImul("+leftOp[0]+","+rightOp[0]+")|0)", "int"];
+  } else if(exp[0] == "-" && Array.isArray(exp)) { // subtraction vs unary negative
     return compileArithm(exp, localContext, globalContext, "-");
-  } else if(exp[0] == "+") {
+  } else if(exp[0] == "+" && Array.isArray(exp)) { // addition vs unary positive
     return compileArithm(exp, localContext, globalContext, "+");
   } else if( (exp * 1) == exp) {
     return [exp, "fixnum"];
@@ -226,6 +233,11 @@ function compileBlock(block) {
       output.push(returnCoercion(c[0], globalStatement[1]));
     } else if(statement[0] == "assignment") {
       var c = compileExpression(statement[3], localContext, globalContext);
+
+      if(statement[2].length == 2 && statement[2][1] == "=") {
+        statement[2] = "="+statement[1]+statement[2][0];
+      }
+
       output.push(statement[1]+statement[2]+fixnum(c[0], contextType(statement[1])));
     } else if(Array.isArray(statement[0])) {
       var stmt = statement[0];
