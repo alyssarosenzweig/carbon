@@ -80,6 +80,11 @@ return -> _ "return " value {% function(d) { return ["return", d[2]] } %}
 BlockComment -> "/*" commentbody "*/" {% function(d) { return ["comment"] } %}
 LineComment -> "//" LineEnd {% function(d) { return ["comment"]} %}
 
+WhileLoop -> "while" _ "(" _ condition _ ")" _ "{" _ block _ "}"
+              {% function(d) { return ["while", d[4], d[10]] } %}
+ForLoop -> "for" _ "(" _ assignment ";" _ condition ";" _ assignment _ ")" _ "{" _ block _ "}"
+            {% function(d) { return ["for", d[4], d[7], d[10], d[16]] } %}
+
 function -> type " " word _ "(" _ params _ ")" _ "{" _ block _ "}"
             {% function(d) { return ["func", d[0], d[2], d[6], d[12]] }%}
           | type " " word _ "(" _ params _ ")" _ "{" _ "}"
@@ -93,6 +98,8 @@ statement -> declaration ";" {% id %}
             | return ";"  {% id %}
             | assignment ";" {% id %}
             | _ IfStatement {% function(d) { return d[1] } %}
+            | _ WhileLoop {% function(d) { return d[1] } %}
+            | _ ForLoop {% function(d) { return d[1] } %}
             | FunctionCall {% id %}
             | BlockComment {% id %}
             | LineComment {% id %}
