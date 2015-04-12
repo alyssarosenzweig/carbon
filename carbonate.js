@@ -283,7 +283,7 @@ function compileBlock(block) {
 
       if(statement[3] != 0) {
         var c = compileExpression(statement[3], localContext, globalContext);
-        output.push(statement[2]+"="+fixnum(c[0], contextType(statement[1])));
+        output.push(statement[2]+"="+fixnum(c[0], statement[1]));
       }
     } else if(Array.isArray(statement[0])) {
       var stmt = statement[0];
@@ -328,6 +328,8 @@ function die() {
   for(var i = 0; i < arguments.length; ++i) {
     console.error(arguments[i]);
   }
+
+  console.trace("Exiting");
 
   process.exit(0);
 }
