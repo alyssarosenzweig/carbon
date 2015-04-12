@@ -1,9 +1,5 @@
 int allocedTotal = 0;
 
-/* this is an incredibly WIP implementation of malloc.
-   this is only implemented to play with pointers.
-   real memory management will come soon */
-
 void* malloc(int size) {
   allocedTotal += size;
 
@@ -14,11 +10,23 @@ void* malloc(int size) {
   return allocedTotal - size;
 }
 
+int* location;
+int* direction;
+
 void init() {
-  int* hello = malloc(4);
-  *hello = 1234;
+  location = malloc(4);
+  direction = malloc(4);
+  *direction = 1;
 }
 
 double loop() {
-  return 1;
+  if(*location > 16) {
+    *direction = -1;
+  } else if(*location < 0) {
+    *direction = 1;
+  }
+
+  *location = *location + *direction;
+
+  return int2double(*location) / 16;
 }
