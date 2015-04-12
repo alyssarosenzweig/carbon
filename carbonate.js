@@ -259,6 +259,8 @@ function contextType(n) {
 
 function compileBlock(block) {
   block.forEach(function(statement) {
+    if(!statement) return;
+
     if(statement[0] == "return") {
       var c = compileExpression(statement[1], localContext, globalContext);
       output.push(returnCoercion(c[0], globalStatement[1]));
@@ -295,7 +297,7 @@ function compileBlock(block) {
       } else {
         die("Unknown double nested statement in function body", statement);
       }
-    } else if(stmt[0] == "comment") {
+    } else if(statement[0] == "comment") {
       /* no comment */
     } else {
       die("Unknown statement in function body", statement);
