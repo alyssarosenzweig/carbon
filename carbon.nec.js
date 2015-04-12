@@ -140,7 +140,7 @@ function id(x) {return x[0]; }
     {"name": "paramvals", "symbols": ["paramvals", "_", {"literal":","}, "_", "paramval"], "postprocess":  function(d) { return d[0].concat([d[4]])} },
     {"name": "block", "symbols": ["statement"]},
     {"name": "block", "symbols": ["block", "statement"], "postprocess":  function(d) { return d[0].concat([d[1]])} },
-    {"name": "statement", "symbols": ["declaration", {"literal":";"}], "postprocess":  id },
+    {"name": "statement", "symbols": ["_", "declaration", {"literal":";"}], "postprocess":  function(d) { return d[1] } },
     {"name": "statement", "symbols": ["return", {"literal":";"}], "postprocess":  id },
     {"name": "statement", "symbols": ["_", "assignment", {"literal":";"}], "postprocess":  function(d) { return d[1] } },
     {"name": "statement", "symbols": ["_", "IfStatement"], "postprocess":  function(d) { return d[1] } },

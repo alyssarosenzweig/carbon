@@ -101,7 +101,7 @@ paramvals -> value {% id %}
 params -> null | param | params _ "," _ param {% function(d){ return d[0].concat([d[4]])} %}
 paramvals -> null | paramval | paramvals _ "," _ paramval {% function(d) { return d[0].concat([d[4]])} %}
 block -> statement | block statement {% function(d) { return d[0].concat([d[1]])} %}
-statement -> declaration ";" {% id %}
+statement -> _ declaration ";" {% function(d) { return d[1] } %}
             | return ";"  {% id %}
             | _ assignment ";" {% function(d) { return d[1] } %}
             | _ IfStatement {% function(d) { return d[1] } %}
