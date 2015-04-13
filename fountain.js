@@ -59,10 +59,8 @@ var fountain = function(ctx) {
       -1.0, -1.0, 0.0
     ]), ctx.gl.STATIC_DRAW);
 
-    ctx.gl.clearColor(1.0, 1.0, 0.0, 1.0);
     ctx.gl.enable(gl.DEPTH_TEST);
     ctx.gl.depthFunc(gl.LEQUAL);
-    ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
   }
 
   ctx.loadShader = function(shadername) {
