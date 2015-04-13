@@ -8,20 +8,6 @@ var fountain = function(ctx) {
     ctx.drink.init();
   }
 
-  return ctx;
-}
-
-/* ctx is an object in the form of:
-{
-  container: document.body,
-}.
-
-function carbon returns a modified ctx
-*/
-
-var carbonGL = function(ctx) {
-  /* initialize rending context */
-
   ctx.initWebGL = function (width, height, shaders) {
     // init canvas
     var canvas = document.createElement("canvas");
@@ -100,5 +86,30 @@ var carbonGL = function(ctx) {
     return shader;
   }
 
+  ctx.glLoop = function() {
+    var value = program.drink.loop();
+
+    ctx.gl.clearColor(value, value, value, 1.0);
+    ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
+
+    var cx = value;
+    var cy = cx;
+    var xScale = 0.4;
+    var yScale = 0.4;
+
+    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, ctx.squareBuffer);
+    ctx.gl.vertexAttribPointer(ctx.gl.vertPosAttr, 3, ctx.gl.FLOAT, false, 0, 0);
+
+    var pUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uPMatrix");
+    ctx.gl.uniformMatrix4fv(pUniform, false, new Float32Array([1.8106601717798214, 0, 0, 0, 0, 2.4142135623730954, 0, 0, 0, 0, -1.002002002002002, -1, 0, 0, -0.20020020020020018, 0]));
+
+    var mvUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uMVMatrix");
+    ctx.gl.uniformMatrix4fv(mvUniform, false, [xScale, 0, 0, 0, 0, yScale, 0, 0, 0, 0, 1, 0, cx, cy, -6, 1]);
+
+    ctx.gl.drawArrays(ctx.gl.TRIANGLE_STRIP, 0, 4);
+
+    requestAnimationFrame(ctx.glLoop);
+  }
+
   return ctx;
-};
+}
