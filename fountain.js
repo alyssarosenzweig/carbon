@@ -1,3 +1,7 @@
+/* fountain.js
+   Carbon JavaScript standard library
+*/
+
 var fountain = function(ctx) {
   ctx.MEMORY_SIZE = 1024 * 1024; // 1MB (enough for small demoes)
 
