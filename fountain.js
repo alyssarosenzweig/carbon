@@ -7,6 +7,7 @@ var fountain = function(ctx) {
 
   ctx.init = function(recipe) {
     ctx.heap = new ArrayBuffer(ctx.MEMORY_SIZE);
+    ctx.float64View = new Float64Array(ctx.heap);
 
     ctx.drink = recipe(window, null, ctx.heap);
     ctx.drink.init();
@@ -50,15 +51,6 @@ var fountain = function(ctx) {
     ctx.gl.vertPosAttr = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "aVertexPosition")
     ctx.gl.enableVertexAttribArray(ctx.gl.vertPosAttr);
 
-    ctx.squareBuffer = ctx.gl.createBuffer();
-    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, ctx.squareBuffer);
-    ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, new Float32Array([
-      1.0, 1.0, 0.0,
-      -1.0, 1.0, 0.0,
-      1.0, -1.0, 0.0,
-      -1.0, -1.0, 0.0
-    ]), ctx.gl.STATIC_DRAW);
-
     ctx.gl.enable(gl.DEPTH_TEST);
     ctx.gl.depthFunc(gl.LEQUAL);
   }
@@ -94,12 +86,35 @@ var fountain = function(ctx) {
     ctx.gl.clearColor(value, value, value, 1.0);
     ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
 
+    var sprites = [
+      [value, value, 1, 1],
+    ]
+
     var cx = value;
     var cy = cx;
     var xScale = 0.4;
     var yScale = 0.4;
 
-    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, ctx.squareBuffer);
+    var buffer = ctx.gl.createBuffer();
+    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, buffer);
+
+    var rbuffer = new Float32Array(sprites.length * 18);
+    for(var i = 0; i < sprites.length; ++i) {
+      var xv = sprites[i][0], yv = sprites[i][1],
+          wv = sprites[i][2], hv = sprites[i][3];
+      var inc = i * 18;
+
+      rbuffer[inc+0] = xv   ; rbuffer[inc+1] = yv   ;
+      rbuffer[inc+3] = xv-wv; rbuffer[inc+4] = yv   ;
+      rbuffer[inc+6] = xv   ; rbuffer[inc+7] = yv-hv;
+
+      rbuffer[inc+9] = xv-wv; rbuffer[inc+10] = yv   ;
+      rbuffer[inc+12] = xv-wv; rbuffer[inc+13] = yv-hv;
+      rbuffer[inc+15] = xv   ; rbuffer[inc+16] = yv-hv;
+    }
+
+    ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, rbuffer, ctx.gl.STATIC_DRAW);
+
     ctx.gl.vertexAttribPointer(ctx.gl.vertPosAttr, 3, ctx.gl.FLOAT, false, 0, 0);
 
     var pUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uPMatrix");
@@ -108,7 +123,7 @@ var fountain = function(ctx) {
     var mvUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uMVMatrix");
     ctx.gl.uniformMatrix4fv(mvUniform, false, [xScale, 0, 0, 0, 0, yScale, 0, 0, 0, 0, 1, 0, cx, cy, -6, 1]);
 
-    ctx.gl.drawArrays(ctx.gl.TRIANGLE_STRIP, 0, 4);
+    ctx.gl.drawArrays(ctx.gl.TRIANGLES, 0, 6 * sprites.length);
 
     requestAnimationFrame(ctx.glLoop);
   }
