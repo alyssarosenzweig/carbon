@@ -104,11 +104,11 @@ var fountain = function(ctx) {
           wv = sprites[i][2], hv = sprites[i][3];
       var inc = i * 18;
 
-      rbuffer[inc+0] = xv   ; rbuffer[inc+1] = yv   ;
-      rbuffer[inc+3] = xv-wv; rbuffer[inc+4] = yv   ;
-      rbuffer[inc+6] = xv   ; rbuffer[inc+7] = yv-hv;
+      rbuffer[inc+00] = xv   ; rbuffer[inc+01] = yv   ;
+      rbuffer[inc+03] = xv-wv; rbuffer[inc+04] = yv   ;
+      rbuffer[inc+06] = xv   ; rbuffer[inc+07] = yv-hv;
 
-      rbuffer[inc+9] = xv-wv; rbuffer[inc+10] = yv   ;
+      rbuffer[inc+09] = xv-wv; rbuffer[inc+10] = yv   ;
       rbuffer[inc+12] = xv-wv; rbuffer[inc+13] = yv-hv;
       rbuffer[inc+15] = xv   ; rbuffer[inc+16] = yv-hv;
     }
