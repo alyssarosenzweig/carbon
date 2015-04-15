@@ -15,8 +15,8 @@ int direction = 0;
 void init() {
   *numSprites = 2;
 
-  *pw = 0.1;
-  *ph = 0.1;
+  *pw = 0.4;
+  *ph = 0.4;
   *ow = *pw;
   *oh = *ph;
 }
