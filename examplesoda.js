@@ -23,13 +23,13 @@ oy=(48|0)
 ow=(56|0)
 oh=(64|0)
 HEAP32[(numSprites)>>2]=(2|0)
-HEAPD64[(pw)>>3]=+0.1
-HEAPD64[(ph)>>3]=+0.1
-HEAPD64[(ow)>>3]=++HEAPD64[(pw)>>3]
-HEAPD64[(oh)>>3]=++HEAPD64[(ph)>>3]
+HEAPD64[(pw)>>3]=+0.4
+HEAPD64[(ph)>>3]=+0.4
+HEAPD64[(ow)>>3]=+HEAPD64[(pw)>>3]
+HEAPD64[(oh)>>3]=+HEAPD64[(ph)>>3]
 }
 function loop(){
-if((direction)==((0|0))){
+if(((direction|0))==((0|0))){
 HEAPD64[(px)>>3]=+((+HEAPD64[(px)>>3])+(+0.01))
 HEAPD64[(py)>>3]=+((+HEAPD64[(py)>>3])+(+0.01))
 HEAPD64[(ox)>>3]=+((+HEAPD64[(ox)>>3])-(+0.01))
