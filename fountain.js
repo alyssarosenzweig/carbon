@@ -7,6 +7,7 @@ var fountain = function(ctx) {
 
   ctx.init = function(recipe) {
     ctx.heap = new ArrayBuffer(ctx.MEMORY_SIZE);
+    ctx.int32View = new Int32Array(ctx.heap);
     ctx.float64View = new Float64Array(ctx.heap);
 
     ctx.drink = recipe(window, null, ctx.heap);
@@ -86,24 +87,20 @@ var fountain = function(ctx) {
     ctx.gl.clearColor(value, value, value, 1.0);
     ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
 
-    var sprites = [
-      [value, value, 1, 1],
-      [-value, -value, 2, 2],
-      [value, -value, 3, 3]
-    ]
-
-    var cx = value;
-    var cy = cx;
-    var xScale = 0.4;
-    var yScale = 0.4;
-
     var buffer = ctx.gl.createBuffer();
     ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, buffer);
 
-    var rbuffer = new Float32Array(sprites.length * 18);
-    for(var i = 0; i < sprites.length; ++i) {
-      var xv = sprites[i][0], yv = sprites[i][1],
-          wv = sprites[i][2], hv = sprites[i][3];
+    var spriteCount = ctx.int32View[0];
+
+    var rbuffer = new Float32Array(spriteCount * 18);
+
+    for(var i = 0; i < spriteCount; ++i) {
+      var sindex = 1 + (i * 4); // starting index for sprite
+      var xv = ctx.float64View[sindex+0], // x coord
+          yv = ctx.float64View[sindex+1], // y coord
+          wv = ctx.float64View[sindex+2], // width
+          hv = ctx.float64View[sindex+3]; // height
+
       var inc = i * 18;
 
       rbuffer[inc+ 0] = xv   ; rbuffer[inc+ 1] = yv   ;
@@ -123,9 +120,9 @@ var fountain = function(ctx) {
     ctx.gl.uniformMatrix4fv(pUniform, false, new Float32Array([1.8106601717798214, 0, 0, 0, 0, 2.4142135623730954, 0, 0, 0, 0, -1.002002002002002, -1, 0, 0, -0.20020020020020018, 0]));
 
     var mvUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uMVMatrix");
-    ctx.gl.uniformMatrix4fv(mvUniform, false, [xScale, 0, 0, 0, 0, yScale, 0, 0, 0, 0, 1, 0, cx, cy, -6, 1]);
+    ctx.gl.uniformMatrix4fv(mvUniform, false, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -6, 1]);
 
-    ctx.gl.drawArrays(ctx.gl.TRIANGLES, 0, 6 * sprites.length);
+    ctx.gl.drawArrays(ctx.gl.TRIANGLES, 0, 6 * spriteCount);
 
     requestAnimationFrame(ctx.glLoop);
   }

@@ -172,7 +172,7 @@ function compileArithm(exp, localContext, globalContext, op) {
       rightOp = compileExpression(exp[2], localContext, globalContext);
 
   var cross = crossFixnum(leftOp, rightOp);
-  var o = "("+cross[0]+op+cross[1]+")";
+  var o = "(("+cross[0]+")"+op+"("+cross[1]+"))";
 
   return [fixnum(o, cross[2]), cross[2]];
 }
@@ -198,7 +198,7 @@ function compileExpression(exp, localContext, globalContext) {
   } else if( (exp * 1) == exp) {
     return [exp, "fixnum"];
   } else if( localContext[stripChar(exp, "*")] || globalContext[stripChar(exp, "*")]) {
-    return [dereference(exp), contextType(exp)];
+    return dereference(exp);
   } else {
     die("Unknown expression: ", exp);
   }
@@ -222,7 +222,7 @@ function crossFixnum(left, right) {
     return [left[0], fixnum(right[0], left[1]), left[1]];
   } else if(right[1] == left[1] && right[1] == "fixnum") {
     if( ((right[0]|0) != right[0]) || ((left[0]|0) != left[0]) ) {
-      return ["+"+left[0], "+"+right[0], "double"];
+      return ["+("+left[0]+")", "+("+right[0]+")", "double"];
     } else if( (right[0]|0 == right[0]) && (left[0]|0 == right[0]|0) ) {
       return [left[0]+"|0", right[0]+"|0", "int"];
     } else {
@@ -308,7 +308,7 @@ function compileBlock(block) {
         return;
       }
 
-      output.push(lvalue+statement[2]+fixnum(c[0], contextType(statement[1])));
+      output.push(lvalue+statement[2]+fixnum(c[0], dereference(statement[1])[1]));
     } else if(statement[0] == "decl") {
       output.push(declarationCoercion(statement[1], statement[2]));
 
@@ -408,7 +408,7 @@ function stripChar(word, s) {
 function dereference(exp) {
   exp = exp.toString();
 
-  if(exp.indexOf("*") == -1) return exp;
+  if(exp.indexOf("*") == -1) return [exp, contextType(exp)];
 
   var depth = exp.split("*").length - 1;
   var bare = exp.slice(depth);
@@ -424,7 +424,7 @@ function dereference(exp) {
 
   var d = fixnum(heapForType(bareType) + "[("+index+")"+addressHeap(bareType)+"]", bareType);
 
-  return d;
+  return [d, bareType];
 }
 
 // reports an error message and dies
