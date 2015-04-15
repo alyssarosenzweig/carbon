@@ -217,9 +217,9 @@ function crossFixnum(left, right) {
   console.log(left+";"+right);
 
   if(left[1] == "fixnum" && ["double", "int", "int*"].indexOf(right[1]) > -1) {
-    return [fixnum(left[0], right[1]), right[0], right[1]];
+    return [fixnum(left[0], right[1]), fixnum(right[0], right[1]), right[1]];
   } else if(right[1] == "fixnum" && ["double", "int", "int*"].indexOf(left[1]) > -1) {
-    return [left[0], fixnum(right[0], left[1]), left[1]];
+    return [fixnum(left[0], left[1]), fixnum(right[0], left[1]), left[1]];
   } else if(right[1] == left[1] && right[1] == "fixnum") {
     if( ((right[0]|0) != right[0]) || ((left[0]|0) != left[0]) ) {
       return ["+("+left[0]+")", "+("+right[0]+")", "double"];
@@ -424,7 +424,7 @@ function dereference(exp) {
       index = fixnum(heapForType("void*") + "[("+index+")"+addressHeap("void*")+"]", "void*");
   }
 
-  var d = fixnum(heapForType(bareType) + "[("+index+")"+addressHeap(bareType)+"]", bareType);
+  var d = heapForType(bareType) + "[("+index+")"+addressHeap(bareType)+"]";
 
   return [d, bareType];
 }
