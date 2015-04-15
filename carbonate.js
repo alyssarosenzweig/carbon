@@ -340,9 +340,11 @@ function compileBlock(block) {
         compileBlock(stmt[1][2]);
         output.push("} else ");
 
-        condition = compileCondition(stmt[2][0][1], localContext, globalContext);
-        output.push("if"+condition+"{")
-        compileBlock(stmt[2][0][2]);
+        //condition = compileCondition(stmt[2][0][1], localContext, globalContext);
+        //output.push("if"+condition+"{")
+        // TODO: else-if chains
+        output.push("{");
+        compileBlock(stmt[2]);
         output.push("} ");
       } else {
         die("Unknown double nested statement in function body", statement);
