@@ -55,15 +55,6 @@ var fountain = function(ctx) {
 
     ctx.squareTexMap = ctx.gl.createBuffer();
     ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, ctx.squareTexMap);
-    ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, new Float32Array([
-      0.0, 0.0,
-      1.0, 0.0,
-      0.0, 1.0,
-
-      1.0, 0.0,
-      1.0, 1.0,
-      0.0, 1.0,
-    ]), ctx.gl.STATIC_DRAW);
 
     ctx.gl.textureCoordAttr = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "aTextureCoord")
     ctx.gl.enableVertexAttribArray(ctx.gl.textureCoordAttr);
@@ -141,6 +132,20 @@ var fountain = function(ctx) {
     ctx.gl.vertexAttribPointer(ctx.gl.vertexPositionAttribute, 3, ctx.gl.FLOAT, false, 0, 0);
 
     ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, ctx.squareTexMap);
+    var arr = new Float32Array(12);
+
+    for(var i = 0; i < spriteCount; ++i) {
+      var ind = i * 12;
+      arr[ind+2] = 1;
+      arr[ind+5] = 1;
+      arr[ind+6] = 1;
+      arr[ind+8] = 1;
+      arr[ind+9] = 1;
+      arr[ind+11] = 1;
+    }
+
+    ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, arr, ctx.gl.STATIC_DRAW);
+
     ctx.gl.vertexAttribPointer(ctx.gl.textureCoordAttr, 2, ctx.gl.FLOAT, false, 0, 0);
 
     ctx.gl.activeTexture(ctx.gl.TEXTURE0);
