@@ -1,7 +1,10 @@
 var fs = require('fs'),
     PNG = require('node-png').PNG;
 
-var components = ["heart", "smile"];
+var length = process.argv[2] * 1,
+    outs = process.argv[3];
+
+var components = process.argv.slice(4);
 var loadedImages = [];
 
 components.forEach(function(image) {
@@ -20,7 +23,7 @@ components.forEach(function(image) {
 
 function generateSheet() {
   var row = Math.ceil(Math.sqrt(components.length));
-  var dimension = 64 * row;
+  var dimension = length * row;
 
   var out = new PNG({
     filterType: -1,
@@ -29,8 +32,10 @@ function generateSheet() {
   });
 
   loadedImages.forEach(function(img, index) {
-    img.bitblt(out, 0, 0, 64, 64, 64 * (index % row), 64 * Math.floor(index / row));
+    img.bitblt(out,
+        0, 0, length, length,
+        length * (index % row), 64 * Math.floor(index / row));
   });
 
-  out.pack().pipe(fs.createWriteStream('out.png'));
+  out.pack().pipe(fs.createWriteStream(outs));
 }
