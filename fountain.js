@@ -111,7 +111,7 @@ var fountain = function(ctx) {
     ctx.t = rbuffer;
 
     for(var i = 0; i < spriteCount; ++i) {
-      var sindex = 1 + (i * 4); // starting index for sprite
+      var sindex = 1 + (i * 8); // starting index for sprite
       var xv = ctx.float64View[sindex+0], // x coord
           yv = ctx.float64View[sindex+1], // y coord
           wv = ctx.float64View[sindex+2], // width
@@ -135,13 +135,33 @@ var fountain = function(ctx) {
     var arr = new Float32Array(12 * spriteCount);
 
     for(var i = 0; i < spriteCount; ++i) {
+      var sindex = 1 + (i * 8); // starting index for sprite
+      var x1 = ctx.float64View[sindex+4], // tex x1
+          y1 = ctx.float64View[sindex+5], // tex y1
+          x2 = ctx.float64View[sindex+6], // tex x2
+          y2 = ctx.float64View[sindex+7]; // tex y2
+
+
       var ind = i * 12;
-      arr[ind+2] = 1;
-      arr[ind+5] = 1;
-      arr[ind+6] = 1;
-      arr[ind+8] = 1;
-      arr[ind+9] = 1;
-      arr[ind+11] = 1;
+
+      arr[ind+0] = x1;
+      arr[ind+1] = y1;
+
+      arr[ind+2] = x2;
+      arr[ind+3] = y1;
+
+      arr[ind+4] = x1;
+      arr[ind+5] = y2;
+
+
+      arr[ind+6] = x2;
+      arr[ind+7] = y1;
+
+      arr[ind+8] = x2;
+      arr[ind+9] = y2;
+
+      arr[ind+10] = x1;
+      arr[ind+11] = y2;
     }
 
     ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, arr, ctx.gl.STATIC_DRAW);
