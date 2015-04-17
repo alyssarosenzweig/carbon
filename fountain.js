@@ -49,11 +49,20 @@ var fountain = function(ctx) {
     }
 
     ctx.gl.useProgram(ctx.gl.whiteShader);
-    ctx.gl.vertPosAttr = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "aVertexPosition")
-    ctx.gl.enableVertexAttribArray(ctx.gl.vertPosAttr);
 
-    ctx.gl.enable(gl.DEPTH_TEST);
-    ctx.gl.depthFunc(gl.LEQUAL);
+    ctx.gl.enable(ctx.gl.DEPTH_TEST);
+    ctx.gl.depthFunc(ctx.gl.LEQUAL);
+
+    ctx.squareTexMap = ctx.gl.createBuffer();
+    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, ctx.squareTexMap);
+
+    ctx.gl.textureCoordAttr = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "aTextureCoord")
+    ctx.gl.enableVertexAttribArray(ctx.gl.textureCoordAttr);
+
+    ctx.gl.vertexPositionAttribute = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "aVertexPosition");
+    ctx.gl.enableVertexAttribArray(ctx.gl.vertexPositionAttribute);
+
+    ctx.heartImage = ctx.makeTexture("heart.png");
   }
 
   ctx.loadShader = function(shadername) {
@@ -87,12 +96,19 @@ var fountain = function(ctx) {
     ctx.gl.clearColor(value, value, value, 1.0);
     ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
 
+    var pUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uPMatrix");
+    ctx.gl.uniformMatrix4fv(pUniform, false, new Float32Array([1.8106601717798214, 0, 0, 0, 0, 2.4142135623730954, 0, 0, 0, 0, -1.002002002002002, -1, 0, 0, -0.20020020020020018, 0]));
+
+    var mvUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uMVMatrix");
+    ctx.gl.uniformMatrix4fv(mvUniform, false, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -6, 1]);
+
     var buffer = ctx.gl.createBuffer();
     ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, buffer);
 
     var spriteCount = ctx.int32View[0];
 
     var rbuffer = new Float32Array(spriteCount * 18);
+    ctx.t = rbuffer;
 
     for(var i = 0; i < spriteCount; ++i) {
       var sindex = 1 + (i * 4); // starting index for sprite
@@ -113,18 +129,51 @@ var fountain = function(ctx) {
     }
 
     ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, rbuffer, ctx.gl.STATIC_DRAW);
+    ctx.gl.vertexAttribPointer(ctx.gl.vertexPositionAttribute, 3, ctx.gl.FLOAT, false, 0, 0);
 
-    ctx.gl.vertexAttribPointer(ctx.gl.vertPosAttr, 3, ctx.gl.FLOAT, false, 0, 0);
+    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, ctx.squareTexMap);
+    var arr = new Float32Array(12 * spriteCount);
 
-    var pUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uPMatrix");
-    ctx.gl.uniformMatrix4fv(pUniform, false, new Float32Array([1.8106601717798214, 0, 0, 0, 0, 2.4142135623730954, 0, 0, 0, 0, -1.002002002002002, -1, 0, 0, -0.20020020020020018, 0]));
+    for(var i = 0; i < spriteCount; ++i) {
+      var ind = i * 12;
+      arr[ind+2] = 1;
+      arr[ind+5] = 1;
+      arr[ind+6] = 1;
+      arr[ind+8] = 1;
+      arr[ind+9] = 1;
+      arr[ind+11] = 1;
+    }
 
-    var mvUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uMVMatrix");
-    ctx.gl.uniformMatrix4fv(mvUniform, false, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -6, 1]);
+    ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, arr, ctx.gl.STATIC_DRAW);
+
+    ctx.gl.vertexAttribPointer(ctx.gl.textureCoordAttr, 2, ctx.gl.FLOAT, false, 0, 0);
+
+    ctx.gl.activeTexture(ctx.gl.TEXTURE0);
+    ctx.gl.bindTexture(ctx.gl.TEXTURE_2D, ctx.heartImage);
+    ctx.gl.uniform1i(ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uSampler"), 0);
 
     ctx.gl.drawArrays(ctx.gl.TRIANGLES, 0, 6 * spriteCount);
 
     requestAnimationFrame(ctx.glLoop);
+  }
+
+  ctx.makeTexture = function(src) {
+    var texture = ctx.gl.createTexture();
+    var image = new Image();
+
+    image.onload = function() {
+      console.log("Image loaded");
+      ctx.gl.bindTexture(ctx.gl.TEXTURE_2D, texture);
+      ctx.gl.texImage2D(ctx.gl.TEXTURE_2D, 0, ctx.gl.RGBA, ctx.gl.RGBA, ctx.gl.UNSIGNED_BYTE, image);
+      ctx.gl.texParameteri(ctx.gl.TEXTURE_2D, ctx.gl.TEXTURE_MAG_FILTER, ctx.gl.LINEAR);
+      ctx.gl.texParameteri(ctx.gl.TEXTURE_2D, ctx.gl.TEXTURE_MIN_FILTER, ctx.gl.LINEAR_MIPMAP_NEAREST);
+      ctx.gl.generateMipmap(ctx.gl.TEXTURE_2D);
+      ctx.gl.bindTexture(ctx.gl.TEXTURE_2D, null);
+    }
+
+    image.src = src;
+
+    return texture;
   }
 
   return ctx;
