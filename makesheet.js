@@ -1,3 +1,14 @@
+/* makesheet.js
+   sprite sheet generator
+   put all sprites as PNG files under the folder sprites
+
+   node makesheet.js 64 out.png heart smile...
+
+   64: size of the image (64x64)
+   out.png: spritesheet output
+   heart, smile.. names of .png files in sprites/ to include
+*/
+
 var fs = require('fs'),
     PNG = require('node-png').PNG;
 
@@ -22,8 +33,13 @@ components.forEach(function(image) {
 })
 
 function generateSheet() {
-  var row = Math.ceil(Math.sqrt(components.length));
-  var dimension = length * row;
+  var dimension = Math.pow(2, Math.ceil(
+      Math.log(length *
+        Math.ceil(Math.sqrt(components.length)))
+      / Math.log(2)
+  ));
+
+  var row = dimension / length;
 
   var out = new PNG({
     filterType: -1,
