@@ -132,7 +132,7 @@ var fountain = function(ctx) {
     ctx.gl.vertexAttribPointer(ctx.gl.vertexPositionAttribute, 3, ctx.gl.FLOAT, false, 0, 0);
 
     ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, ctx.squareTexMap);
-    var arr = new Float32Array(12);
+    var arr = new Float32Array(12 * spriteCount);
 
     for(var i = 0; i < spriteCount; ++i) {
       var ind = i * 12;
