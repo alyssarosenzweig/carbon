@@ -390,6 +390,14 @@ function compileBlock(block) {
       /* no comment */
     } else if(statement[0] == "call") {
       output.push(generateFunctionCall(statement)[0]);
+    } else if(statement[0] == "for") {
+      output.push("for(");
+      compileBlock([statement[1]]);
+      output.push(compileCondition(statement[2], localContext, globalContext));
+      compileBlock([statement[3]]);
+      output.push("){");
+      compileBlock(statement[4]);
+      output.push("}");
     } else {
       die("Unknown statement in function body", statement);
     }
