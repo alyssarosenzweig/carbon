@@ -17,6 +17,8 @@ var localContext = {};
 
 var functionLookup = {};
 
+var structLookup = {};
+
 var initExists = false, loopExists = false;
 
 var globalStatement;
@@ -99,6 +101,21 @@ fs.readFile(process.argv[2], function(err, content) {
       /* handled ahead-of-time to resolve asm.js compilation errors */
     } else if(globalStatement[0] == "comment") {
       /* no comment */
+    } else if(globalStatement[0] == "struct") {
+      var pointers = {};
+      var types = {};
+
+      // generate lookup table
+
+      globalStatement[2].forEach(function(member, index) {
+        pointers[member[1]] = index * 8; // maximum padding yay
+        types[member[1]] = member[0];
+      })
+
+      structLookup[globalStatement[1]] = {
+        pointers: pointers,
+        types: types
+      }
     } else {
       die("Unknown global statement: "+globalStatement);
     }
