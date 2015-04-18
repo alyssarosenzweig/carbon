@@ -12,10 +12,11 @@
 var fs = require('fs'),
     PNG = require('node-png').PNG;
 
-var length = process.argv[2] * 1,
-    outs = process.argv[3];
+var args = process.argv[2].split(" ");
+var length = args[0] * 1,
+    outs = args[1];
 
-var components = process.argv.slice(4);
+var components = args.slice(2);
 var loadedImages = [];
 
 components.forEach(function(image) {
