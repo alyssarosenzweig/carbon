@@ -388,6 +388,8 @@ function compileBlock(block) {
       }
     } else if(statement[0] == "comment") {
       /* no comment */
+    } else if(statement[0] == "call") {
+      output.push(generateFunctionCall(statement)[0]);
     } else {
       die("Unknown statement in function body", statement);
     }
@@ -412,7 +414,12 @@ function generateFunctionCall(call) {
 
   if(params.length > 1) params = params.slice(0, -1);
 
-  return ["("+returnedCoercion(call[1]+"("+params+")", func.return)+")", func.return];
+  if(func.return != "void") {
+    return ["("+returnedCoercion(call[1]+"("+params+")", func.return)+")", func.return];
+  }
+
+  return [call[1]+"("+params+");", func.return];
+
 }
 
 function heapForType(type) {
