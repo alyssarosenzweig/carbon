@@ -49,7 +49,7 @@ void init() {
   *oty2 = 0.5;
 
   *oa = 0.0;
-  *pa = 0.0;
+  heart->a = 0.0;
 }
 
 void loop() {

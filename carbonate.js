@@ -143,7 +143,7 @@ fs.readFile(process.argv[2], function(err, content) {
 })
 
 function declarationCoercion(type, name) {
-  if(type == "int" || type.indexOf("*") > -1) {
+  if(type == "int" || type.indexOf("*") > -1 || type.indexOf("ptr") > -1) {
     return "var "+name+" = 0;";
   } else if(type == "double") {
     return "var "+name+" = 0.0;";
@@ -154,7 +154,7 @@ function declarationCoercion(type, name) {
 
 function parameterCoercion(type, name) {
   // TODO: more types
-  if(type == "int" || type.indexOf("*") > -1) {
+  if(type == "int" || type.indexOf("*") > -1 || type.indexOf("ptr") > -1) {
     return name+" = "+name+"|0;";
   } else if(type == "double") {
     return name+" = +"+name+";";
@@ -164,7 +164,7 @@ function parameterCoercion(type, name) {
 }
 
 function returnedCoercion(call, type) {
-  if(type == "int" || type.indexOf("*") > -1) {
+  if(type == "int" || type.indexOf("*") > -1 || type.indexOf("ptr") > -1) {
     return call+"|0";
   } else if(type == "double") {
     return "+"+call;
@@ -175,7 +175,7 @@ function returnedCoercion(call, type) {
 
 function returnCoercion(value, type) {
   // TODO: more types
-  if(type == "int" || type.indexOf("*") > -1) {
+  if(type == "int" || type.indexOf("*") > -1 || type.indexOf("ptr") > -1) {
     return "return ("+value+")|0;";
   } else if(type == "double") {
     return "return +("+value+")";
@@ -216,6 +216,8 @@ function compileExpression(exp, localContext, globalContext) {
     return [exp, "fixnum"];
   } else if( localContext[stripChar(exp, "*")] || globalContext[stripChar(exp, "*")]) {
     return dereference(exp);
+  } else if( exp.indexOf("->") > 0) {
+    return structAccess(exp);
   } else {
     die("Unknown expression: ", exp);
   }
@@ -233,9 +235,9 @@ function compileCondition(condition, localContext, globalContext) {
 function crossFixnum(left, right) {
   console.log(left+";"+right);
 
-  if(left[1] == "fixnum" && ["double", "int", "int*"].indexOf(right[1]) > -1) {
+  if(left[1] == "fixnum" && ["double", "int", "int*"].indexOf(right[1]) > -1 || right[1].indexOf("ptr") > -1) {
     return [fixnum(left[0], right[1]), fixnum(right[0], right[1]), right[1]];
-  } else if(right[1] == "fixnum" && ["double", "int", "int*"].indexOf(left[1]) > -1) {
+  } else if(right[1] == "fixnum" && ["double", "int", "int*"].indexOf(left[1]) > -1 || left[1].indexOf("ptr") > -1) {
     return [fixnum(left[0], left[1]), fixnum(right[0], left[1]), left[1]];
   } else if(right[1] == left[1] && right[1] == "fixnum") {
     if( ((right[0]|0) != right[0]) || ((left[0]|0) != left[0]) ) {
@@ -266,7 +268,7 @@ function fixnum(num, type) {
   //if( (num * 1) == num) {
     if(type == "double") {
       return "+"+num;
-    } else if(type == "int" || type.indexOf("*") > -1) {
+    } else if(type == "int" || type.indexOf("*") > -1 || type.indexOf("ptr") > -1) {
       return "("+num+"|0)";
     } else {
       console.trace("Cannot fix "+num+" to "+type);
@@ -283,6 +285,13 @@ function contextType(n) {
   if(n[0] == "*") {
     var depth = n.split("*").length - 1;
     return contextType(n.slice(depth));
+  }
+
+  if(n.indexOf("->") > 0) {
+    var comps = n.split("->");
+    var structType = contextType(comps[0]).slice(10, -1);
+    var struct = structLookup[structType];
+    return struct.types[comps[1]];
   }
 
   if(globalContext[n])
@@ -444,6 +453,18 @@ function dereference(exp) {
   var d = heapForType(bareType) + "[("+index+")"+addressHeap(bareType)+"]";
 
   return [d, bareType];
+}
+
+function structAccess(exp) {
+  var comps = exp.split("->");
+  var structType = contextType(comps[0]).slice(10, -1);
+  var struct = structLookup[structType];
+  var memberType = struct.types[comps[1]];
+
+  var index = "("+comps[0]+"|0)" + "+ ("+struct.pointers[comps[1]]+"|0)";
+
+  var d = heapForType(memberType) + "[("+index+")"+addressHeap(memberType)+"]";
+  return [d, memberType];
 }
 
 // reports an error message and dies
