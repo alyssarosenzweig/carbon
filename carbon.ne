@@ -10,6 +10,7 @@ globalLine -> function {% id %}
             | declaration ";" {% id %}
             | BlockComment {% id %}
             | LineComment {% id %}
+            | struct {% id %}
 
 program -> globalLine _ {% function(d) { return [d[0]] } %}
         | program globalLine _ {% function(d) { return d[0].concat([d[1]]) }%}
@@ -61,6 +62,12 @@ declUndef -> type " " word {% function(d) { return ["decl", d[0], d[2], null] } 
 declInit -> declUndef _ "=" _ value {% function(d) { return [d[0][0], d[0][1], d[0][2], d[4]] } %}
 declaration -> declInit {% id %}
               | declUndef {% id %}
+
+struct -> "struct " _ word _ "{" structBits _ "};"
+          {% function(d) { return ["struct", d[2], d[5]]} %}
+structBit -> _ declUndef ";" {% function(d) { return [d[1][1], d[1][2]] } %}
+structBits -> structBit |
+              structBits structBit {% function(d) { return d[0].concat([d[1]]) } %}
 
 assignment -> variable _ assignmentOperator _ value {% function(d) { return ["assignment", d[0], d[2], d[4]] } %}
 assignmentOperator -> "=" {% id %}

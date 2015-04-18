@@ -1,5 +1,17 @@
 int* numSprites = 0;
 
+struct Sprite {
+  double x;
+  double y;
+  double w;
+  double h;
+  double tx1;
+  double ty1;
+  double tx2;
+  double ty2;
+  double a;
+};
+
 double* isTouching = 65536;
 double* touchX = 65544;
 double* touchY = 65552;
