@@ -48,14 +48,14 @@ var fountain = function(ctx) {
     surface.addEventListener("mousemove", function(e) {
       if(ctx.touching) {
         ctx.touchX = ctx.page2canvasX(e.pageX);
-        ctx.touchY = ctx.page2canvasY(e.pageY);      
+        ctx.touchY = ctx.page2canvasY(e.pageY);
       }
     });
 
   }
 
-  ctx.page2canvasX = function(x) { return ((x / ctx.width) * 5.333) - 2.666 }
-  ctx.page2canvasY = function(y) { return 2 - ((y / ctx.height) * 4)  }
+  ctx.page2canvasX = function(x) { return +((x / ctx.width) * 4) - 2 }
+  ctx.page2canvasY = function(y) { return -((y / ctx.height) * 4) + 2  }
 
   ctx.initWebGL = function (width, height, shaders) {
     // init canvas
