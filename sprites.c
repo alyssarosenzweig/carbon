@@ -12,19 +12,11 @@ struct Sprite {
   double a;
 };
 
+structptr(Sprite) heart = 8;
+
 double* isTouching = 65536;
 double* touchX = 65544;
 double* touchY = 65552;
-
-double* px = 8;
-double* py = 16;
-double* pw = 24;
-double* ph = 32;
-double* ptx1 = 40;
-double* pty1 = 48;
-double* ptx2 = 56;
-double* pty2 = 64;
-double* pa = 72;
 
 double* ox = 80;
 double* oy = 88;
@@ -41,15 +33,15 @@ int direction = 0;
 void init() {
   *numSprites = 2;
 
-  *pw = 0.4;
-  *ph = 0.4;
-  *ow = *pw;
-  *oh = *ph;
+  heart->w = 0.4;
+  heart->h = 0.4;
+  *ow = 0.4;
+  *oh = 0.4;
 
-  *ptx1 = 0.0;
-  *pty1 = 0.0;
-  *ptx2 = 0.5;
-  *pty2 = 0.5;
+  heart->tx1 = 0.0;
+  heart->ty1 = 0.0;
+  heart->tx2 = 0.5;
+  heart->ty2 = 0.5;
 
   *otx1 = 0.5;
   *oty1 = 0.0;
@@ -61,17 +53,19 @@ void init() {
 }
 
 void loop() {
-  *px = *touchX;
-  *py = *touchY;
+  heart->x = *touchX;
+  heart->y = *touchY;
 
   if(direction == 0) {
     *ox -= 0.01;
     *oy -= 0.01;
-    *pa += 0.01;
+
+    heart->a += 0.01;
   } else {
     *ox += 0.01;
     *oy += 0.01;
-    *pa -= 0.01;
+
+    heart->a -= 0.01;
   }
 
   if(*ox > 2) {

@@ -20,6 +20,7 @@ pointer -> null {% function() { return "" } %}
             | "*" pointer {% function(d) { return d[0]+d[1] } %}
 
 type -> baretype pointer {% function(d) { return d[0][0] + d[1] } %}
+        | "structptr(" word ")" {% function(d) { return d.join("") } %}
 
 integer -> [0-9\-] {% id %}
           | integer [0-9] {% function(d) { return "" + d[0] + d[1] } %}
@@ -55,6 +56,7 @@ N -> number {% id %}
 
 variable -> word {% id %} |
         "*" variable {% function(d) { return d[0] + d[1] } %}
+        | word "->" word {% function(d) { return d.join("") } %}
 
 value -> AS {% id %}
 
