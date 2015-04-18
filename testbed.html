@@ -38,8 +38,13 @@
         [
         "varying highp vec2 vTextureCoord;",
         "uniform sampler2D uSampler;",
+        "precision mediump float;",
         "void main(void) {",
-        "  gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));",
+        "  vec4 color = texture2D(uSampler, vTextureCoord);",
+        "  gl_FragColor = color.rgba;",
+        "  if(color.a == 0.0) {",
+            "discard;",
+          "}",
         "}"
         ]
       }
