@@ -11,6 +11,8 @@ var output = [
     "var HEAPD64 = new stdlib.Float64Array(buffer);"
 ];
 
+var structptrRegex = /structptr\(([^\)]+)\)/;
+
 var globalContext = {};
 var initCode = [];
 var localContext = {};
@@ -121,7 +123,8 @@ fs.readFile(process.argv[2], function(err, content) {
 
       structLookup[globalStatement[1]] = {
         pointers: pointers,
-        types: types
+        types: types,
+        sizeof: globalStatement[2].length * 8
       }
     } else {
       die("Unknown global statement: "+globalStatement);
@@ -201,7 +204,7 @@ function compileArithm(exp, localContext, globalContext, op) {
   return [fixnum(o, cross[2]), cross[2]];
 }
 
-function compileExpression(exp, localContext, globalContext) {
+function compileExpression(exp, localContext, globalContext, typehint) {
   if(exp[0] == "/") {
     return compileArithm(exp, localContext, globalContext, "/");
   } else if(exp[0] == "*" && Array.isArray(exp)) { // multiplication vs pointer dereferencing
@@ -220,6 +223,10 @@ function compileExpression(exp, localContext, globalContext) {
   } else if(exp[0] == "call") {
     return generateFunctionCall(exp);
   } else if( (exp * 1) == exp) {
+    if(typehint) {
+      return [fixnum(exp, typehint), typehint];
+    }
+
     return [exp, "fixnum"];
   } else if( localContext[stripChar(exp, "*")] || globalContext[stripChar(exp, "*")]) {
     return dereference(exp);
@@ -391,11 +398,14 @@ function compileBlock(block) {
     } else if(statement[0] == "call") {
       output.push(generateFunctionCall(statement)[0]);
     } else if(statement[0] == "for") {
-      output.push("for(");
       compileBlock([statement[1]]);
-      output.push(compileCondition(statement[2], localContext, globalContext));
+      output.push(";"+compileCondition(statement[2], localContext, globalContext)+";");
       compileBlock([statement[3]]);
-      output.push("){");
+
+      var header = output.slice(-3).join("");
+      output.splice(-3);
+
+      output.push("for("+header+"){");
       compileBlock(statement[4]);
       output.push("}");
     } else {
@@ -411,13 +421,20 @@ function generateFunctionCall(call) {
     return ["+("+compileExpression(call[2], localContext, globalContext)[0]+"|0)", "double"];
   } else if(call[1] == "double2int") {
     return ["(~~(+"+compileExpression(call[2], localContext, globalContext)[0]+")|0)", "int"];
+  } else if(call[1] == "get") {
+    var t = contextType(call[2][0]);
+
+    return [compileExpression(["+",
+        call[2][0],
+        ["*", call[2][1], ptrsizeof(t)]
+    ], localContext, globalContext)[0], t];
   }
 
   var params = "";
 
   call[2].forEach(function(p, index) {
       var param = func.paramList[index];
-      params += fixnum(p, param[0])+",";
+      params += (compileExpression(p, localContext, globalContext, param[0])[0])+",";
   })
 
   if(params.length > 1) params = params.slice(0, -1);
@@ -492,6 +509,17 @@ function structAccess(exp) {
 
   var d = heapForType(memberType) + "[("+index+")"+addressHeap(memberType)+"]";
   return [d, memberType];
+}
+
+function ptrsizeof(type) {
+  if(type == "int*") return 4;
+  if(type == "double*") return 8;
+
+  if(structptrRegex.test(type)) {
+    var structName = type.match(structptrRegex)[1];
+
+    return structLookup[structName].sizeof;
+  }
 }
 
 // reports an error message and dies
