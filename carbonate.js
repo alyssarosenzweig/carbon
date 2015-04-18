@@ -327,6 +327,10 @@ function compileBlock(block) {
         }
       }
 
+      if(lvalue.indexOf("->") > 0) {
+        lvalue = structAccess(lvalue)[0];
+      }
+
       if(statement[2].length == 2 && statement[2][1] == "=") {
         var expa = compileExpression([statement[2][0], statement[1], c[0]],
                     localContext, globalContext);
