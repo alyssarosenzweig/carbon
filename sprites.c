@@ -12,15 +12,17 @@ double* ptx1 = 40;
 double* pty1 = 48;
 double* ptx2 = 56;
 double* pty2 = 64;
+double* pa = 72;
 
-double* ox = 72;
-double* oy = 80;
-double* ow = 88;
-double* oh = 96;
-double* otx1 = 104;
-double* oty1 = 112;
-double* otx2 = 120;
-double* oty2 = 128;
+double* ox = 80;
+double* oy = 88;
+double* ow = 96;
+double* oh = 104;
+double* otx1 = 112;
+double* oty1 = 120;
+double* otx2 = 128;
+double* oty2 = 136;
+double* oa = 144;
 
 int direction = 0;
 
@@ -41,6 +43,9 @@ void init() {
   *oty1 = 0.0;
   *otx2 = 1.0;
   *oty2 = 0.5;
+
+  *oa = 0.0;
+  *pa = 0.0;
 }
 
 void loop() {
@@ -58,9 +63,11 @@ void loop() {
   if(direction == 0) {
     *ox -= 0.01;
     *oy -= 0.01;
+    *oa += 0.01;
   } else {
     *ox += 0.01;
     *oy += 0.01;
+    *oa -= 0.01;
   }
 
   if(*ox > 1.5) {

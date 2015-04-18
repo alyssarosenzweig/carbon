@@ -94,6 +94,9 @@ var fountain = function(ctx) {
     ctx.gl.vertexPositionAttribute = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "aVertexPosition");
     ctx.gl.enableVertexAttribArray(ctx.gl.vertexPositionAttribute);
 
+    ctx.gl.angleAttr = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "angle");
+    ctx.gl.enableVertexAttribArray(ctx.gl.angleAttr);
+
     ctx.sheet1 = ctx.makeTexture("spritesheet.png");
   }
 
@@ -147,7 +150,7 @@ var fountain = function(ctx) {
     ctx.t = rbuffer;
 
     for(var i = 0; i < spriteCount; ++i) {
-      var sindex = 1 + (i * 8); // starting index for sprite
+      var sindex = 1 + (i * 9); // starting index for sprite
       var xv = ctx.float64View[sindex+0], // x coord
           yv = ctx.float64View[sindex+1], // y coord
           wv = ctx.float64View[sindex+2], // width
@@ -167,11 +170,31 @@ var fountain = function(ctx) {
     ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, rbuffer, ctx.gl.STATIC_DRAW);
     ctx.gl.vertexAttribPointer(ctx.gl.vertexPositionAttribute, 3, ctx.gl.FLOAT, false, 0, 0);
 
+    var vertData = ctx.gl.createBuffer();
+    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, vertData);
+
+    var angleBuffer = new Float32Array(6 * spriteCount);
+    for(var i = 0; i < spriteCount; ++i) {
+      var sindex = 1 + (i * 9); // starting index for sprite
+      var angle = ctx.float64View[sindex+8];
+      var ind = 6 * i;
+
+      angleBuffer[ind] = angle;
+      angleBuffer[ind+1] = angle;
+      angleBuffer[ind+2] = angle;
+      angleBuffer[ind+3] = angle;
+      angleBuffer[ind+4] = angle;
+      angleBuffer[ind+5] = angle;
+    }
+
+    ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, angleBuffer, ctx.gl.STATIC_DRAW);
+    ctx.gl.vertexAttribPointer(ctx.gl.angleAttr, 1, ctx.gl.FLOAT, false, 0, 0);
+
     ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, ctx.squareTexMap);
     var arr = new Float32Array(12 * spriteCount);
 
     for(var i = 0; i < spriteCount; ++i) {
-      var sindex = 1 + (i * 8); // starting index for sprite
+      var sindex = 1 + (i * 9); // starting index for sprite
       var x1 = ctx.float64View[sindex+4], // tex x1
           y1 = ctx.float64View[sindex+5], // tex y1
           x2 = ctx.float64View[sindex+6], // tex x2
