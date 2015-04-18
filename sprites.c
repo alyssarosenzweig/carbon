@@ -28,13 +28,15 @@ void init() {
   *ow = *pw;
   *oh = *ph;
 
-  *ptx2 = 1.0;
-  *pty2 = 1.0;
+  *ptx1 = 0.0;
+  *pty1 = 0.0;
+  *ptx2 = 0.5;
+  *pty2 = 0.5;
 
   *otx1 = 0.5;
-  *oty1 = 0;
+  *oty1 = 0.0;
   *otx2 = 1.0;
-  *oty2 = 1.0;
+  *oty2 = 0.5;
 }
 
 void loop() {

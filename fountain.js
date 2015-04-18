@@ -62,7 +62,7 @@ var fountain = function(ctx) {
     ctx.gl.vertexPositionAttribute = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "aVertexPosition");
     ctx.gl.enableVertexAttribArray(ctx.gl.vertexPositionAttribute);
 
-    ctx.heartImage = ctx.makeTexture("heart.png");
+    ctx.sheet1 = ctx.makeTexture("spritesheet.png");
   }
 
   ctx.loadShader = function(shadername) {
@@ -169,7 +169,7 @@ var fountain = function(ctx) {
     ctx.gl.vertexAttribPointer(ctx.gl.textureCoordAttr, 2, ctx.gl.FLOAT, false, 0, 0);
 
     ctx.gl.activeTexture(ctx.gl.TEXTURE0);
-    ctx.gl.bindTexture(ctx.gl.TEXTURE_2D, ctx.heartImage);
+    ctx.gl.bindTexture(ctx.gl.TEXTURE_2D, ctx.sheet1);
     ctx.gl.uniform1i(ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uSampler"), 0);
 
     ctx.gl.drawArrays(ctx.gl.TRIANGLES, 0, 6 * spriteCount);
