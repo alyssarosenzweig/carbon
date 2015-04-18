@@ -51,6 +51,7 @@ var fountain = function(ctx) {
     ctx.gl.useProgram(ctx.gl.whiteShader);
 
     ctx.gl.enable(ctx.gl.DEPTH_TEST);
+    ctx.gl.enable(ctx.gl.BLEND);
     ctx.gl.depthFunc(ctx.gl.LEQUAL);
 
     ctx.squareTexMap = ctx.gl.createBuffer();
