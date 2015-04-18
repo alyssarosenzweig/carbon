@@ -1,5 +1,9 @@
 int* numSprites = 0;
 
+double* isTouching = 65536;
+double* touchX = 65544;
+double* touchY = 65552;
+
 double* px = 8;
 double* py = 16;
 double* pw = 24;
@@ -40,23 +44,30 @@ void init() {
 }
 
 void loop() {
+  if(*isTouching == 1.0) {
+    *pw = 1.0;
+    *ph = 1.0;
+  } else {
+    *pw = 0.4;
+    *ph = 0.4;
+  }
+
+  *px = *touchX;
+  *py = *touchY;
+
   if(direction == 0) {
-    *px += 0.01;
-    *py += 0.01;
     *ox -= 0.01;
     *oy -= 0.01;
   } else {
     *ox += 0.01;
     *oy += 0.01;
-    *px -= 0.01;
-    *py -= 0.01;
-  }
-
-  if(*px > 1.5) {
-    direction = 1;
   }
 
   if(*ox > 1.5) {
     direction = 0;
+  }
+
+  if(*ox < -1.5) {
+    direction = 1;
   }
 }

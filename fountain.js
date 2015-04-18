@@ -39,7 +39,7 @@ var fountain = function(ctx) {
   }
 
   ctx.page2canvasX = function(x) { return ((x / ctx.width) * 7.2) - 3.6 }
-  ctx.page2canvasY = function(Y) { return ((y / ctx.height) * 5.4) - 2.7 }
+  ctx.page2canvasY = function(y) { return 2.7 - ((y / ctx.height) * 5.4)  }
 
   ctx.initWebGL = function (width, height, shaders) {
     // init canvas
@@ -123,9 +123,13 @@ var fountain = function(ctx) {
   }
 
   ctx.glLoop = function() {
-    var value = program.drink.loop();
+    ctx.float64View[8192] = !!ctx.touching;
+    ctx.float64View[8193] = ctx.touchX;
+    ctx.float64View[8194] = ctx.touchY;
 
-    ctx.gl.clearColor(value, value, value, 1.0);
+    program.drink.loop();
+
+    ctx.gl.clearColor(0.0, 0.0, 0.0, 1.0);
     ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
 
     var pUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uPMatrix");
@@ -150,8 +154,6 @@ var fountain = function(ctx) {
           hv = ctx.float64View[sindex+3]; // height
 
       var inc = i * 18;
-
-      xv = ctx.touchX; // TODO: actually integrate touchness
 
       rbuffer[inc+ 0] = xv   ; rbuffer[inc+ 1] = yv   ;
       rbuffer[inc+ 3] = xv-wv; rbuffer[inc+ 4] = yv   ;
