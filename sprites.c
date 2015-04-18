@@ -12,8 +12,37 @@ struct Sprite {
   double a;
 };
 
-structptr(Sprite) heart = 8;
-structptr(Sprite) smile = 80;
+structptr(Sprite) newSprite(double x,
+                            double y,
+                            double w,
+                            double h,
+                            double topLeftX,
+                            double topLeftY,
+                            double bottomRightX,
+                            double bottomRightY)
+{
+  // generate pointer to sprite
+  structptr(Sprite) ret = 8 + ((*numSprites) * 72);
+
+  ret->x = x;
+  ret->y = y;
+  ret->w = w;
+  ret->h = h;
+
+  ret->tx1 = topLeftX;
+  ret->ty1 = topLeftY;
+
+  ret->tx2 = bottomRightX;
+  ret->ty2 = bottomRightY;
+
+  // alert fountain of the new sprite
+  *numSprites += 1;
+
+  return ret;
+}
+
+structptr(Sprite) heart;
+structptr(Sprite) smile;
 
 double* isTouching = 65536;
 double* touchX = 65544;
@@ -22,22 +51,10 @@ double* touchY = 65552;
 int direction = 0;
 
 void init() {
-  *numSprites = 2;
-
-  heart->w = 0.4;
-  heart->h = 0.4;
-  smile->w = 0.4;
-  smile->h = 0.4;
-
-  heart->tx1 = 0.0;
-  heart->ty1 = 0.0;
-  heart->tx2 = 0.5;
-  heart->ty2 = 0.5;
-
-  smile->tx1 = 0.5;
-  smile->ty1 = 0.0;
-  smile->tx2 = 1.0;
-  smile->ty2 = 0.5;
+  heart = newSprite(0.0, 0.0, 0.4, 0.4, // xywh
+                    0.0, 0.0, 0.5, 0.5); // xyxy
+  smile = newSprite(0.0, 0.0, 0.4, 0.4,
+                    0.5, 0.0, 1.0, 0.5);
 }
 
 void loop() {

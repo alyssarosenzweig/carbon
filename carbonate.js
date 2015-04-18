@@ -31,8 +31,15 @@ fs.readFile(process.argv[2], function(err, content) {
   // iterate to find metadata AOT
   tokens.map(function(gs) {
     if(gs[0] == "func") {
+      var params = {};
+      gs[3].forEach(function(p) {
+        params[p[1]] = p[0];
+      })
+
       functionLookup[gs[2]] = {
-        return: gs[1]
+        return: gs[1],
+        paramList: gs[3],
+        params: params
       }
     } else if(gs[0] == "decl") {
       output.push(declarationCoercion(gs[1], gs[2]));
@@ -398,8 +405,9 @@ function generateFunctionCall(call) {
 
   var params = "";
 
-  call[2].forEach(function(p) {
-      params += p+",";
+  call[2].forEach(function(p, index) {
+      var param = func.paramList[index];
+      params += fixnum(p, param[0])+",";
   })
 
   if(params.length > 1) params = params.slice(0, -1);

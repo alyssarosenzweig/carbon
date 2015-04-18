@@ -134,11 +134,11 @@ function id(x) {return x[0]; }
     {"name": " string$20", "symbols": [{"literal":"*"}, {"literal":"/"}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "BlockComment", "symbols": [" string$19", "commentbody", " string$20"], "postprocess":  function(d) { return ["comment"] } },
+    {"name": "BlockComment", "symbols": ["_", " string$19", "commentbody", " string$20"], "postprocess":  function(d) { return ["comment"] } },
     {"name": " string$21", "symbols": [{"literal":"/"}, {"literal":"/"}], "postprocess": function joiner(d) {
         return d.join('');
     }},
-    {"name": "LineComment", "symbols": [" string$21", "LineEnd"], "postprocess":  function(d) { return ["comment"]} },
+    {"name": "LineComment", "symbols": ["_", " string$21", "LineEnd"], "postprocess":  function(d) { return ["comment"]} },
     {"name": " string$22", "symbols": [{"literal":"w"}, {"literal":"h"}, {"literal":"i"}, {"literal":"l"}, {"literal":"e"}], "postprocess": function joiner(d) {
         return d.join('');
     }},
@@ -170,6 +170,8 @@ function id(x) {return x[0]; }
     {"name": "statement", "symbols": ["LineComment"], "postprocess":  id },
     {"name": "_", "symbols": [], "postprocess":  nullify },
     {"name": "_", "symbols": [/[\s]/, "_"], "postprocess":  nullify },
+    {"name": "_", "symbols": ["LineComment", "_"], "postprocess":  nullify },
+    {"name": "_", "symbols": ["BlockComment", "_"], "postprocess":  nullify },
     {"name": "commentbody", "symbols": [], "postprocess":  nullify },
     {"name": "commentbody", "symbols": [/[^\*]/, "commentbody"], "postprocess":  nullify },
     {"name": "commentbody", "symbols": [{"literal":"*"}, /[^\/]/, "commentbody"], "postprocess":  nullify },

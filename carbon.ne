@@ -92,8 +92,8 @@ conditional -> conditionals {% function(d) { return d[0][0] } %}
 
 return -> _ "return " value {% function(d) { return ["return", d[2]] } %}
 
-BlockComment -> "/*" commentbody "*/" {% function(d) { return ["comment"] } %}
-LineComment -> "//" LineEnd {% function(d) { return ["comment"]} %}
+BlockComment -> _ "/*" commentbody "*/" {% function(d) { return ["comment"] } %}
+LineComment -> _ "//" LineEnd {% function(d) { return ["comment"]} %}
 
 WhileLoop -> "while" _ "(" _ condition _ ")" _ "{" block _ "}"
               {% function(d) { return ["while", d[4], d[9]] } %}
@@ -123,6 +123,8 @@ statement -> _ declaration ";" {% function(d) { return d[1] } %}
 # whitespace
 _ -> null {% nullify %}
     | [\s] _ {% nullify %}
+    | LineComment _ {% nullify %}
+    | BlockComment _ {% nullify %}
 
 commentbody -> null {% nullify %}
     | [^\*] commentbody {% nullify %}
