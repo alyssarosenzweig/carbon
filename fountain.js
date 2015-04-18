@@ -12,14 +12,45 @@ var fountain = function(ctx) {
 
     ctx.drink = recipe(window, null, ctx.heap);
     ctx.drink.init();
+
+    ctx.touching = false;
+    ctx.touchX = 0;
+    ctx.touchY = 0;
   }
+
+  ctx.initTouchEvents = function(surface) {
+    // TODO: multi touch
+
+    surface.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+      ctx.touching = true;
+    });
+
+    surface.addEventListener("touchend", function(e) {
+      e.preventDefault();
+      ctx.touching = false;
+    });
+
+    surface.addEventListener("touchmove", function(e) {
+      e.preventDefault();
+      ctx.touchX = ctx.page2canvasX(e.changedTouches[0].pageX);
+      ctx.touchY = ctx.page2canvasY(e.changedTouches[0].pageY);
+    });
+  }
+
+  ctx.page2canvasX = function(x) { return ((x / ctx.width) * 7.2) - 3.6 }
+  ctx.page2canvasY = function(Y) { return ((y / ctx.height) * 5.4) - 2.7 }
 
   ctx.initWebGL = function (width, height, shaders) {
     // init canvas
+    ctx.width = width;
+    ctx.height = height;
+
     var canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
     ctx.container.appendChild(canvas);
+    ctx.surface = canvas;
 
     ctx.shaders = shaders;
 
@@ -119,6 +150,8 @@ var fountain = function(ctx) {
           hv = ctx.float64View[sindex+3]; // height
 
       var inc = i * 18;
+
+      xv = ctx.touchX; // TODO: actually integrate touchness
 
       rbuffer[inc+ 0] = xv   ; rbuffer[inc+ 1] = yv   ;
       rbuffer[inc+ 3] = xv-wv; rbuffer[inc+ 4] = yv   ;
