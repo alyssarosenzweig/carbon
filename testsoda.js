@@ -4,6 +4,9 @@ var MathImul = stdlib.Math.imul;
 var HEAP32 = new stdlib.Int32Array(buffer);
 var HEAPD64 = new stdlib.Float64Array(buffer);
 var numSprites = 0;
+var isTouching = 0;
+var touchX = 0;
+var touchY = 0;
 var px = 0;
 var py = 0;
 var pw = 0;
@@ -22,6 +25,9 @@ var otx2 = 0;
 var oty2 = 0;
 var direction = 0;
 function init(){
+isTouching=(65536|0)
+touchX=(65544|0)
+touchY=(65552|0)
 px=(8|0)
 py=(16|0)
 pw=(24|0)
@@ -53,23 +59,29 @@ HEAPD64[(otx2)>>3]=+1
 HEAPD64[(oty2)>>3]=+0.5
 }
 function loop(){
+if((+HEAPD64[(isTouching)>>3])==(+1)){
+HEAPD64[(pw)>>3]=+1
+HEAPD64[(ph)>>3]=+1
+} else 
+{
+HEAPD64[(pw)>>3]=+0.4
+HEAPD64[(ph)>>3]=+0.4
+} 
+HEAPD64[(px)>>3]=+HEAPD64[(touchX)>>3]
+HEAPD64[(py)>>3]=+HEAPD64[(touchY)>>3]
 if(((direction|0))==((0|0))){
-HEAPD64[(px)>>3]=+((+HEAPD64[(px)>>3])+(+0.01))
-HEAPD64[(py)>>3]=+((+HEAPD64[(py)>>3])+(+0.01))
 HEAPD64[(ox)>>3]=+((+HEAPD64[(ox)>>3])-(+0.01))
 HEAPD64[(oy)>>3]=+((+HEAPD64[(oy)>>3])-(+0.01))
 } else 
 {
 HEAPD64[(ox)>>3]=+((+HEAPD64[(ox)>>3])+(+0.01))
 HEAPD64[(oy)>>3]=+((+HEAPD64[(oy)>>3])+(+0.01))
-HEAPD64[(px)>>3]=+((+HEAPD64[(px)>>3])-(+0.01))
-HEAPD64[(py)>>3]=+((+HEAPD64[(py)>>3])-(+0.01))
 } 
-if((+HEAPD64[(px)>>3])>(+1.5)){
-direction=(1|0)
-}
 if((+HEAPD64[(ox)>>3])>(+1.5)){
 direction=(0|0)
+}
+if((+HEAPD64[(ox)>>3])<(+-1.5)){
+direction=(1|0)
 }
 }
 return {
