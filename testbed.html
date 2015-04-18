@@ -21,6 +21,7 @@
         source:
         [
         "attribute vec3 aVertexPosition;",
+        "attribute vec3 aSpritePosition;",
         "attribute vec2 aTextureCoord;",
         "uniform mat4 uMVMatrix;",
         "uniform mat4 uPMatrix;",
@@ -28,11 +29,15 @@
         "varying highp vec2 vTextureCoord;",
         "",
         "void main(void) {",
+        "  if(angle == float(0)) {",
+            "gl_Position = vec4(aVertexPosition, 1.0) + vec4(aSpritePosition, 1.0);",
+        "} else {",
         "  mat4 RotationMatrix = mat4(cos(angle), -sin(angle), 0.0, 0.0,",
         "                             sin(angle), cos(angle), 0.0, 0.0,",
         "                             0.0, 0.0, 1.0, 0.0,",
         "                             0.0, 0.0, 0.0, 1.0);",
-        "  gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0) * RotationMatrix;",
+        "  gl_Position = (RotationMatrix * vec4(aVertexPosition, 1.0)) + vec4(aSpritePosition, 1.0);",
+        "}",
         "  vTextureCoord = aTextureCoord;",
         "}",
         ]

@@ -38,8 +38,8 @@ var fountain = function(ctx) {
     });
   }
 
-  ctx.page2canvasX = function(x) { return ((x / ctx.width) * 7.2) - 3.6 }
-  ctx.page2canvasY = function(y) { return 2.7 - ((y / ctx.height) * 5.4)  }
+  ctx.page2canvasX = function(x) { return ((x / ctx.width) * 5.333) - 2.666 }
+  ctx.page2canvasY = function(y) { return 2 - ((y / ctx.height) * 4)  }
 
   ctx.initWebGL = function (width, height, shaders) {
     // init canvas
@@ -94,6 +94,9 @@ var fountain = function(ctx) {
     ctx.gl.vertexPositionAttribute = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "aVertexPosition");
     ctx.gl.enableVertexAttribArray(ctx.gl.vertexPositionAttribute);
 
+    ctx.gl.spritePositionAttribute = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "aSpritePosition");
+    ctx.gl.enableVertexAttribArray(ctx.gl.spritePositionAttribute);
+
     ctx.gl.angleAttr = ctx.gl.getAttribLocation(ctx.gl.whiteShader, "angle");
     ctx.gl.enableVertexAttribArray(ctx.gl.angleAttr);
 
@@ -135,19 +138,21 @@ var fountain = function(ctx) {
     ctx.gl.clearColor(0.0, 0.0, 0.0, 1.0);
     ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
 
+/*
     var pUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uPMatrix");
     ctx.gl.uniformMatrix4fv(pUniform, false, new Float32Array([1.8106601717798214, 0, 0, 0, 0, 2.4142135623730954, 0, 0, 0, 0, -1.002002002002002, -1, 0, 0, -0.20020020020020018, 0]));
 
     var mvUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uMVMatrix");
     ctx.gl.uniformMatrix4fv(mvUniform, false, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -6, 1]);
+*/
 
     var buffer = ctx.gl.createBuffer();
-    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, buffer);
+    var buffer2 = ctx.gl.createBuffer();
 
     var spriteCount = ctx.int32View[0];
 
     var rbuffer = new Float32Array(spriteCount * 18);
-    ctx.t = rbuffer;
+    var pbuffer = new Float32Array(spriteCount * 18);
 
     for(var i = 0; i < spriteCount; ++i) {
       var sindex = 1 + (i * 9); // starting index for sprite
@@ -158,17 +163,29 @@ var fountain = function(ctx) {
 
       var inc = i * 18;
 
-      rbuffer[inc+ 0] = xv   ; rbuffer[inc+ 1] = yv   ;
-      rbuffer[inc+ 3] = xv-wv; rbuffer[inc+ 4] = yv   ;
-      rbuffer[inc+ 6] = xv   ; rbuffer[inc+ 7] = yv-hv;
+      rbuffer[inc+ 0] = 0; rbuffer[inc+ 1] = 0;
+      rbuffer[inc+ 3] = -wv; rbuffer[inc+ 4] = 0;
+      rbuffer[inc+ 6] = 0; rbuffer[inc+ 7] = -hv;
 
-      rbuffer[inc+ 9] = xv-wv; rbuffer[inc+10] = yv   ;
-      rbuffer[inc+12] = xv-wv; rbuffer[inc+13] = yv-hv;
-      rbuffer[inc+15] = xv   ; rbuffer[inc+16] = yv-hv;
+      rbuffer[inc+ 9] = -wv; rbuffer[inc+10] = 0;
+      rbuffer[inc+12] = -wv; rbuffer[inc+13] = -hv;
+      rbuffer[inc+15] = 0; rbuffer[inc+16] = -hv;
+
+      pbuffer[inc+ 0] = xv   ; pbuffer[inc+ 1] = yv   ;
+      pbuffer[inc+ 3] = xv   ; pbuffer[inc+ 4] = yv   ;
+      pbuffer[inc+ 6] = xv   ; pbuffer[inc+ 7] = yv   ;
+      pbuffer[inc+ 9] = xv   ; pbuffer[inc+10] = yv   ;
+      pbuffer[inc+12] = xv   ; pbuffer[inc+13] = yv   ;
+      pbuffer[inc+15] = xv   ; pbuffer[inc+16] = yv   ;
     }
 
+    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, buffer);
     ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, rbuffer, ctx.gl.STATIC_DRAW);
     ctx.gl.vertexAttribPointer(ctx.gl.vertexPositionAttribute, 3, ctx.gl.FLOAT, false, 0, 0);
+
+    ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, buffer2);
+    ctx.gl.bufferData(ctx.gl.ARRAY_BUFFER, pbuffer, ctx.gl.STATIC_DRAW);
+    ctx.gl.vertexAttribPointer(ctx.gl.spritePositionAttribute, 3, ctx.gl.FLOAT, false, 0, 0);
 
     var vertData = ctx.gl.createBuffer();
     ctx.gl.bindBuffer(ctx.gl.ARRAY_BUFFER, vertData);

@@ -49,32 +49,24 @@ void init() {
 }
 
 void loop() {
-  if(*isTouching == 1.0) {
-    *pw = 1.0;
-    *ph = 1.0;
-  } else {
-    *pw = 0.4;
-    *ph = 0.4;
-  }
-
   *px = *touchX;
   *py = *touchY;
 
   if(direction == 0) {
     *ox -= 0.01;
     *oy -= 0.01;
-    *oa += 0.01;
+    *pa += 0.01;
   } else {
     *ox += 0.01;
     *oy += 0.01;
-    *oa -= 0.01;
+    *pa -= 0.01;
   }
 
-  if(*ox > 1.5) {
+  if(*ox > 2) {
     direction = 0;
   }
 
-  if(*ox < -1.5) {
+  if(*ox < -1.9) {
     direction = 1;
   }
 }
