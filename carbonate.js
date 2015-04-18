@@ -24,7 +24,7 @@ var initExists = false, loopExists = false;
 var globalStatement;
 
 fs.readFile(process.argv[2], function(err, content) {
-  var tokens = parser.feed(content.toString()).results[0];
+  var tokens = parser.feed(fs.readFileSync("fountain.c")+content.toString()).results[0];
 
   var functionList = [];
 
