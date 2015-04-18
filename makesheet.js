@@ -47,6 +47,8 @@ function generateSheet() {
     height: dimension
   });
 
+  out.data.fill(0);
+
   loadedImages.forEach(function(img, index) {
     img.bitblt(out,
         0, 0, length, length,
