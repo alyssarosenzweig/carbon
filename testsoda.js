@@ -15,6 +15,7 @@ var ptx1 = 0;
 var pty1 = 0;
 var ptx2 = 0;
 var pty2 = 0;
+var pa = 0;
 var ox = 0;
 var oy = 0;
 var ow = 0;
@@ -23,6 +24,7 @@ var otx1 = 0;
 var oty1 = 0;
 var otx2 = 0;
 var oty2 = 0;
+var oa = 0;
 var direction = 0;
 function init(){
 isTouching=(65536|0)
@@ -36,14 +38,16 @@ ptx1=(40|0)
 pty1=(48|0)
 ptx2=(56|0)
 pty2=(64|0)
-ox=(72|0)
-oy=(80|0)
-ow=(88|0)
-oh=(96|0)
-otx1=(104|0)
-oty1=(112|0)
-otx2=(120|0)
-oty2=(128|0)
+pa=(72|0)
+ox=(80|0)
+oy=(88|0)
+ow=(96|0)
+oh=(104|0)
+otx1=(112|0)
+oty1=(120|0)
+otx2=(128|0)
+oty2=(136|0)
+oa=(144|0)
 HEAP32[(numSprites)>>2]=(2|0)
 HEAPD64[(pw)>>3]=+0.4
 HEAPD64[(ph)>>3]=+0.4
@@ -57,6 +61,8 @@ HEAPD64[(otx1)>>3]=+0.5
 HEAPD64[(oty1)>>3]=+0
 HEAPD64[(otx2)>>3]=+1
 HEAPD64[(oty2)>>3]=+0.5
+HEAPD64[(oa)>>3]=+0
+HEAPD64[(pa)>>3]=+0
 }
 function loop(){
 if((+HEAPD64[(isTouching)>>3])==(+1)){
@@ -72,10 +78,12 @@ HEAPD64[(py)>>3]=+HEAPD64[(touchY)>>3]
 if(((direction|0))==((0|0))){
 HEAPD64[(ox)>>3]=+((+HEAPD64[(ox)>>3])-(+0.01))
 HEAPD64[(oy)>>3]=+((+HEAPD64[(oy)>>3])-(+0.01))
+HEAPD64[(oa)>>3]=+((+HEAPD64[(oa)>>3])+(+0.01))
 } else 
 {
 HEAPD64[(ox)>>3]=+((+HEAPD64[(ox)>>3])+(+0.01))
 HEAPD64[(oy)>>3]=+((+HEAPD64[(oy)>>3])+(+0.01))
+HEAPD64[(oa)>>3]=+((+HEAPD64[(oa)>>3])-(+0.01))
 } 
 if((+HEAPD64[(ox)>>3])>(+1.5)){
 direction=(0|0)
