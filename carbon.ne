@@ -116,7 +116,7 @@ statement -> _ declaration ";" {% function(d) { return d[1] } %}
             | _ IfStatement {% function(d) { return d[1] } %}
             | _ WhileLoop {% function(d) { return d[1] } %}
             | _ ForLoop {% function(d) { return d[1] } %}
-            | FunctionCall {% id %}
+            | _ FunctionCall ";" {% function(d) { return d[1] } %}
             | BlockComment {% id %}
             | LineComment {% id %}
 
