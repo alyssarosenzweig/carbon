@@ -36,6 +36,22 @@ var fountain = function(ctx) {
       ctx.touchX = ctx.page2canvasX(e.changedTouches[0].pageX);
       ctx.touchY = ctx.page2canvasY(e.changedTouches[0].pageY);
     });
+
+    surface.addEventListener("mousedown", function(e) {
+      ctx.touching = true;
+    });
+
+    surface.addEventListener("mouseup", function(e) {
+      ctx.touching = false;
+    });
+
+    surface.addEventListener("mousemove", function(e) {
+      if(ctx.touching) {
+        ctx.touchX = ctx.page2canvasX(e.pageX);
+        ctx.touchY = ctx.page2canvasY(e.pageY);      
+      }
+    });
+
   }
 
   ctx.page2canvasX = function(x) { return ((x / ctx.width) * 5.333) - 2.666 }
@@ -137,14 +153,6 @@ var fountain = function(ctx) {
 
     ctx.gl.clearColor(0.0, 0.0, 0.0, 1.0);
     ctx.gl.clear(ctx.gl.COLOR_BUFFER_BIT | ctx.gl.DEPTH_BUFFER_BIT);
-
-/*
-    var pUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uPMatrix");
-    ctx.gl.uniformMatrix4fv(pUniform, false, new Float32Array([1.8106601717798214, 0, 0, 0, 0, 2.4142135623730954, 0, 0, 0, 0, -1.002002002002002, -1, 0, 0, -0.20020020020020018, 0]));
-
-    var mvUniform = ctx.gl.getUniformLocation(ctx.gl.whiteShader, "uMVMatrix");
-    ctx.gl.uniformMatrix4fv(mvUniform, false, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -6, 1]);
-*/
 
     var buffer = ctx.gl.createBuffer();
     var buffer2 = ctx.gl.createBuffer();
