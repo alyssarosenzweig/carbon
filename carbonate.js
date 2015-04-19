@@ -228,8 +228,10 @@ function compileExpression(exp, localContext, globalContext, typehint) {
     }
 
     return [exp, "fixnum"];
-  } else if( localContext[stripChar(exp, "*")] || globalContext[stripChar(exp, "*")]) {
-    return dereference(exp);
+  } else if( localContext[exp] || globalContext[exp]) {
+    return [exp, contextType(exp)];
+  } else if(exp[0] == "derefexp") {
+    return dereference(exp[2]);
   } else if( exp.indexOf("->") > 0) {
     return structAccess(exp);
   } else {
@@ -328,17 +330,9 @@ function compileBlock(block) {
 
       var lvalue = statement[1];
 
-      if(statement[1][0] == "*") {
-        var depth = statement[1].split("*").length - 1;
-        var bareName = statement[1].slice(depth);
-        var type = contextType(bareName);
-        var bareType = type.slice(0, type.length - depth);
-
-        lvalue = heapForType(bareType)+"[("+bareName+")"+addressHeap(bareType)+"]";
-
-        while(--depth) {
-          lvalue = heapForType("void*")+"[("+lvalue+")"+addressHeap("void*")+"]";
-        }
+      if(statement[1][0] == "derefexp") {
+        var type = contextType(statement[1][2]);
+        lvalue = heapForType(type)+"[("+statement[1][2]+")"+addressHeap(type)+"]";
       }
 
       if(lvalue.indexOf("->") > 0) {
@@ -461,7 +455,9 @@ function heapForType(type) {
 }
 
 function addressHeap(type) {
-  if(type == "int" || type == "void*") {
+  type = stripChar(type, "*")
+
+  if(type == "int" || type == "void") {
     return ">>2";
   }
 
@@ -478,23 +474,21 @@ function stripChar(word, s) {
 }
 
 function dereference(exp) {
-  exp = exp.toString();
+  // TODO: multi depth
 
-  if(exp.indexOf("*") == -1) return [exp, contextType(exp)];
+  var i = compileExpression(exp, localContext, globalContext);
+  var bareType = i[1];
 
-  var depth = exp.split("*").length - 1;
-  var bare = exp.slice(depth);
-
-  var type = contextType(exp);
-  var bareType = type.slice(0, -depth);
-
-  var index = bare;
-
-  while(--depth) {
-      index = fixnum(heapForType("void*") + "[("+index+")"+addressHeap("void*")+"]", "void*");
+  if(bareType.slice(-1) == "*") {
+    bareType = bareType.slice(0, -1);
   }
 
-  var d = heapForType(bareType) + "[("+index+")"+addressHeap(bareType)+"]";
+  if(bareType.slice(0, 9) == "structptr") {
+    // TODO: what actually goes here?
+    bareType = "int";
+  }
+
+  var d = heapForType(bareType) + "[("+i[0]+")"+addressHeap(bareType)+"]";
 
   return [d, bareType];
 }

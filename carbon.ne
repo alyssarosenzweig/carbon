@@ -55,7 +55,7 @@ N -> number {% id %}
     | variable {% id %}
 
 variable -> word {% id %} |
-        "*" variable {% function(d) { return d[0] + d[1] } %}
+        "*" AS {% function(d) { return ["derefexp", d[0], d[1]] } %}
         | word "->" word {% function(d) { return d.join("") } %}
 
 value -> AS {% id %}

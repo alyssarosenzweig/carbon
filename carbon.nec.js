@@ -54,7 +54,7 @@ function id(x) {return x[0]; }
     {"name": "N", "symbols": ["number"], "postprocess":  id },
     {"name": "N", "symbols": ["variable"], "postprocess":  id },
     {"name": "variable", "symbols": ["word"], "postprocess":  id },
-    {"name": "variable", "symbols": [{"literal":"*"}, "variable"], "postprocess":  function(d) { return d[0] + d[1] } },
+    {"name": "variable", "symbols": [{"literal":"*"}, "AS"], "postprocess":  function(d) { return ["derefexp", d[0], d[1]] } },
     {"name": " string$5", "symbols": [{"literal":"-"}, {"literal":">"}], "postprocess": function joiner(d) {
         return d.join('');
     }},
