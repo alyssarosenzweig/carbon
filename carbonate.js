@@ -402,6 +402,8 @@ function compileBlock(block) {
       output.push("for("+header+"){");
       compileBlock(statement[4]);
       output.push("}");
+    } else if(statement[0] == "break") {
+      output.push("break;");
     } else {
       die("Unknown statement in function body", statement);
     }

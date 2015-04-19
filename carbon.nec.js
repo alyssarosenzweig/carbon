@@ -168,6 +168,10 @@ function id(x) {return x[0]; }
     {"name": "statement", "symbols": ["_", "FunctionCall", {"literal":";"}], "postprocess":  function(d) { return d[1] } },
     {"name": "statement", "symbols": ["BlockComment"], "postprocess":  id },
     {"name": "statement", "symbols": ["LineComment"], "postprocess":  id },
+    {"name": " string$24", "symbols": [{"literal":"b"}, {"literal":"r"}, {"literal":"e"}, {"literal":"a"}, {"literal":"k"}, {"literal":";"}], "postprocess": function joiner(d) {
+        return d.join('');
+    }},
+    {"name": "statement", "symbols": ["_", " string$24"], "postprocess":  function(d) { return ["break"] } },
     {"name": "_", "symbols": [], "postprocess":  nullify },
     {"name": "_", "symbols": [/[\s]/, "_"], "postprocess":  nullify },
     {"name": "_", "symbols": ["LineComment", "_"], "postprocess":  nullify },

@@ -119,6 +119,7 @@ statement -> _ declaration ";" {% function(d) { return d[1] } %}
             | _ FunctionCall ";" {% function(d) { return d[1] } %}
             | BlockComment {% id %}
             | LineComment {% id %}
+            | _ "break;" {% function(d) { return ["break"] } %}
 
 # whitespace
 _ -> null {% nullify %}
